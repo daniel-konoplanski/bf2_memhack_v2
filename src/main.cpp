@@ -2,7 +2,7 @@
 
 __stdcall void cheatloop()
 {
-    
+
 }
 
 BOOL WINAPI DllMain([[maybe_unused]] HINSTANCE hinstDLL,
