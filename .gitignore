@@ -12,6 +12,7 @@ dist/
 out/
 temp/
 tmp/
+build/
 *.log
 
 # Ignore OS-generated files
