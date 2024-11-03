@@ -23,7 +23,10 @@ NametagsRange::NametagsRange() : FeatureCommon(renddx9_plus_0x0012EEF7, { 0xD9, 
 void NametagsRange::enable()
 {
     using namespace helpers::memory_operarions;
-	VirtualProtect(reinterpret_cast<LPVOID>(m_adress), m_original_code.size(), PAGE_EXECUTE_READWRITE, nullptr);
+
+    [[maybe_unused]] DWORD old_protection{};
+
+	VirtualProtect(reinterpret_cast<LPVOID>(m_adress), m_original_code.size(), PAGE_EXECUTE_READWRITE, &old_protection);
     write_jump(reinterpret_cast<void*>(m_adress), reinterpret_cast<void*>(&NametagsRange::codecave), m_original_code.size());
 }
 

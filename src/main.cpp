@@ -3,7 +3,7 @@
 #include <constants/module_addresses.hpp>
 #include <features/nametags/nametags_manager.hpp>
 
-static constexpr uint32_t KEY_POLL_VAL_MS{ 50 };
+static constexpr uint32_t KEY_POLL_VAL_MS{50};
 
 DWORD __stdcall cheatloop(LPVOID lpParam)
 {
