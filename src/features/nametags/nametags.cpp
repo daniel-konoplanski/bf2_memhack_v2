@@ -20,7 +20,9 @@ void Nametags::enable()
 {
     using namespace helpers::memory_operarions;
 
-	VirtualProtect(reinterpret_cast<LPVOID>(m_adress), m_original_code.size(), PAGE_EXECUTE_READWRITE, nullptr);
+    [[maybe_unused]] DWORD old_protection{};
+
+	VirtualProtect(reinterpret_cast<LPVOID>(m_adress), m_original_code.size(), PAGE_EXECUTE_READWRITE, &old_protection);
     write_jump(reinterpret_cast<void*>(m_adress), reinterpret_cast<void*>(&Nametags::codecave), m_original_code.size());
 }
 
@@ -28,8 +30,10 @@ void Nametags::disable()
 {
     using namespace helpers::memory_operarions;
 
+    [[maybe_unused]] DWORD old_protection{};
+
     write_bytes(reinterpret_cast<void*>(m_adress), m_original_code);
-	VirtualProtect(reinterpret_cast<LPVOID>(m_adress), m_original_code.size(), PAGE_EXECUTE_READ, nullptr);
+	VirtualProtect(reinterpret_cast<LPVOID>(m_adress), m_original_code.size(), PAGE_EXECUTE_READ, &old_protection);
 }
 
 __attribute__((naked)) void Nametags::codecave()
