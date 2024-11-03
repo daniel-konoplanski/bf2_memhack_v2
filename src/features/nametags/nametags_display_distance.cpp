@@ -1,7 +1,7 @@
 #include <constants/module_addresses.hpp>
 #include <helpers/memory_operations.hpp>
 
-#include "nametags_display_range.hpp"
+#include "nametags_display_distance.hpp"
 
 namespace features::nametags
 {
@@ -15,27 +15,27 @@ const uintptr_t renddx9_plus_0x00130365 = constants::modules::get_renddx9_addres
 
 }  // namespace
 
-NametagsDisplayRange::NametagsDisplayRange() : FeatureCommon(renddx9_plus_0x00130357, { 0x8B, 0x8E, 0xB8, 0x00, 0x00, 0x00 })
+NametagsDisplayDistance::NametagsDisplayDistance() : FeatureCommon(renddx9_plus_0x00130357, { 0x8B, 0x8E, 0xB8, 0x00, 0x00, 0x00 })
 {
 }
 
-void NametagsDisplayRange::enable()
+void NametagsDisplayDistance::enable()
 {
     using namespace helpers::memory_operarions;
 
     [[maybe_unused]] DWORD old_protection{};
 
 	VirtualProtect(reinterpret_cast<LPVOID>(m_adress), m_original_code.size(), PAGE_EXECUTE_READWRITE, &old_protection);
-    write_jump(reinterpret_cast<void*>(m_adress), reinterpret_cast<void*>(&NametagsDisplayRange::codecave), m_original_code.size());
+    write_jump(reinterpret_cast<void*>(m_adress), reinterpret_cast<void*>(&NametagsDisplayDistance::codecave), m_original_code.size());
 }
 
-void NametagsDisplayRange::disable()
+void NametagsDisplayDistance::disable()
 {
     using namespace helpers::memory_operarions;
 
 }
 
-__attribute__((naked)) void NametagsDisplayRange::codecave()
+__attribute__((naked)) void NametagsDisplayDistance::codecave()
 {
     asm volatile (
         ".intel_syntax noprefix;"                                   // Switch to Intel syntax for readability
@@ -56,4 +56,3 @@ __attribute__((naked)) void NametagsDisplayRange::codecave()
 }
 
 }  // namespace features::nametags
-

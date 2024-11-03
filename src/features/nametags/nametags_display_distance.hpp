@@ -6,10 +6,10 @@
 namespace features::nametags
 {
 
-class NametagsDisplayRange : public FeatureCommon
+class NametagsDisplayDistance : public FeatureCommon
 {
 public:
-    NametagsDisplayRange();
+    NametagsDisplayDistance();
     void enable() override;
     void disable() override;
 

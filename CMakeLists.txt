@@ -19,7 +19,7 @@ set(SOURCES
     src/features/feature_common.cpp
     src/features/nametags/nametags.cpp
     src/features/nametags/nametags_range.cpp
-    src/features/nametags/nametags_display_range.cpp
+    src/features/nametags/nametags_display_distance.cpp
     src/features/nametags/nametags_manager.cpp
 )
 
