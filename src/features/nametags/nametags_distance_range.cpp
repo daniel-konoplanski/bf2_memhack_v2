@@ -35,6 +35,10 @@ void NametagsDistanceRange::disable()
 {
     using namespace helpers::memory_operarions;
 
+    [[maybe_unused]] DWORD old_protection{};
+
+    write_bytes(reinterpret_cast<void*>(m_adress), m_original_code);
+	VirtualProtect(reinterpret_cast<LPVOID>(m_adress), m_original_code.size(), PAGE_EXECUTE_READ, &old_protection);
 }
 
 __attribute__((naked)) void NametagsDistanceRange::codecave()
