@@ -3,11 +3,10 @@
 namespace constants::modules
 {
 
-void initialize_module_addresses()
+uintptr_t get_renddx9_address()
 {
-    RENDDX9 = reinterpret_cast<uintptr_t>(GetModuleHandle("RendDX9.dll"));
+    static uintptr_t renddx9 = reinterpret_cast<uintptr_t>(GetModuleHandle("RendDX9.dll"));
+    return renddx9;
 }
-
-uintptr_t RENDDX9;
 
 }  // namespace constants::asm

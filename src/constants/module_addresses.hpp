@@ -5,8 +5,6 @@
 namespace constants::modules
 {
 
-void initialize_module_addresses();
-
-extern uintptr_t RENDDX9;
+uintptr_t get_renddx9_address();
 
 }  // namespace constants::asm

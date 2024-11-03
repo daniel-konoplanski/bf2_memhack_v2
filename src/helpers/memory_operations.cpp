@@ -10,7 +10,7 @@ namespace
 inline DWORD get_jump_adress(DWORD source_address, DWORD destination_address)
 {
     constexpr uint32_t JMP_BYTE_SIZE{5};
-    return source_address - (destination_address + JMP_BYTE_SIZE);
+    return destination_address - (source_address + JMP_BYTE_SIZE);
 }
 
 }  // namespace
@@ -36,14 +36,14 @@ void write_jump(void* source_ptr, void* destination_ptr, uint32_t write_byte_siz
     }
 }
 
-void write_bytes(void* source_ptr, const BYTE* const data_to_write_ptr, uint32_t write_byte_size)
+void write_bytes(void* source_ptr, const std::vector<BYTE>& data_to_write)
 {
     BYTE* source_address{reinterpret_cast<BYTE*>(source_ptr)};
 
-    for (uint32_t i{0}; i < write_byte_size; ++i)
+    for (uint32_t i{0}; i < data_to_write.size(); ++i)
     {
         BYTE* source_address_offset = source_address + i;
-        *source_address_offset = data_to_write_ptr[i];
+        *source_address_offset = data_to_write[i];
     }
 }
 

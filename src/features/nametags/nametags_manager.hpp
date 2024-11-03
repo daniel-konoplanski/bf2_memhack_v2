@@ -19,4 +19,6 @@ private:
     std::list<std::unique_ptr<features::IFeature>> m_features{};
 };
 
+using NametagsManagerPtr = std::unique_ptr<NametagsManager>;
+
 }  // namespace managers

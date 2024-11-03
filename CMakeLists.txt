@@ -5,7 +5,6 @@ cmake_minimum_required(VERSION 3.22)
 project(bf2_memhack VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_SYSTEM_NAME Windows)
-# set(CMAKE_SYSTEM_PROCESSOR i686)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
@@ -26,9 +25,11 @@ set(SOURCES
 # Create the DLL (shared library)
 add_library(bf2memhack SHARED ${SOURCES})
 
-set_target_properties(bf2memhack PROPERTIES OUTPUT_NAME "bf2memhack" SUFFIX ".dll")
+set_target_properties(bf2memhack PROPERTIES OUTPUT_NAME "bf2memhack" SUFFIX ".dll" PREFIX "")
 
 # Include MinGW headers
 include_directories(
     ${CMAKE_SOURCE_DIR}/src
 )
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libgcc -static-libstdc++")
