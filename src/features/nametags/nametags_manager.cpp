@@ -3,6 +3,7 @@
 #include <features/nametags/nametags.hpp>
 #include <features/nametags/nametags_range.hpp>
 #include <features/nametags/nametags_display_distance.hpp>
+#include <features/nametags/nametags_distance_range.hpp>
 
 namespace managers
 {
@@ -14,6 +15,7 @@ NametagsManager::NametagsManager()
     m_features.push_back(std::make_unique<Nametags>());
     m_features.push_back(std::make_unique<NametagsRange>());
     m_features.push_back(std::make_unique<NametagsDisplayDistance>());
+    m_features.push_back(std::make_unique<NametagsDistanceRange>());
 }
     
 void NametagsManager::enable()

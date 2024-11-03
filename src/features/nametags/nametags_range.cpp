@@ -9,7 +9,7 @@ namespace features::nametags
 namespace
 {
 
-constexpr DWORD range = 0x44160000;
+constexpr DWORD range = 0x44160000; // TODO: could be replaced with a 32 bit float
 const uintptr_t renddx9_plus_0x0012EEF7 = constants::modules::get_renddx9_address() + 0x0012EEF7;
 const uintptr_t renddx9_plus_0x0012EEFD = constants::modules::get_renddx9_address() + 0x0012EEFD;
 const uintptr_t range_adress = reinterpret_cast<uintptr_t>(&range);
