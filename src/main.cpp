@@ -3,7 +3,7 @@
 #include <constants/module_addresses.hpp>
 #include <features/nametags/nametags_manager.hpp>
 
-static constexpr uint32_t KEY_PRESS_SLEEP_VAL_MS{ 300 };
+static constexpr uint32_t KEY_POLL_VAL_MS{ 50 };
 
 DWORD __stdcall cheatloop(LPVOID lpParam)
 {
@@ -12,26 +12,26 @@ DWORD __stdcall cheatloop(LPVOID lpParam)
 
     NametagsManagerPtr nametagsManager{ std::make_unique<NametagsManager>() };
 
-    // while (true)
-    // {
-	// 	if (GetAsyncKeyState(VK_F10))
-	// 	{
-	//     	if (nametag_enabled)
-	// 		{
-				nametagsManager->enable();
-				nametag_enabled = !nametag_enabled;
-				Sleep(KEY_PRESS_SLEEP_VAL_MS);
-		// 	}
-		// 	else
-		// 	{
-		// 		nametagsManager->disable();
-		// 		nametag_enabled = !nametag_enabled;
-		// 		Sleep(KEY_PRESS_SLEEP_VAL_MS);
-		// 	}
-		// }
+	SHORT previousState{0};
 
-		Sleep(100000);
-    // }
+    while (true)
+    {
+        SHORT currentState = GetAsyncKeyState(VK_F10);
+
+        if ((currentState & 0x8000) && !(previousState & 0x8000))
+        {
+            nametag_enabled ^= true;
+
+            if (nametag_enabled)
+                nametagsManager->enable();
+            else
+                nametagsManager->disable();
+        }
+
+        previousState = currentState;
+
+        Sleep(KEY_POLL_VAL_MS);
+    }
 
     return 0;
 }
