@@ -16,30 +16,9 @@ const uintptr_t range_adress = reinterpret_cast<uintptr_t>(&range);
 
 }  // namespace
 
-NametagsRange::NametagsRange() : FeatureCommon(renddx9_plus_0x0012EEF7, { 0xD9, 0x05, 0x3C, 0x9A, 0x9A, 0x07 })
+NametagsRange::NametagsRange()
+    : FeatureCommon(renddx9_plus_0x0012EEF7, { 0xD9, 0x05, 0x3C, 0x9A, 0x9A, 0x07 }, &NametagsRange::codecave)
 {
-}
-
-void NametagsRange::enable()
-{
-    using namespace helpers::memory_operarions;
-
-    DWORD old_protection{}, dummy_protection{};
-
-    VirtualProtect(reinterpret_cast<LPVOID>(m_adress), m_original_code.size(), PAGE_EXECUTE_READWRITE, &old_protection);
-    write_jump(reinterpret_cast<void*>(m_adress), reinterpret_cast<void*>(&NametagsRange::codecave), m_original_code.size());
-    VirtualProtect(reinterpret_cast<LPVOID>(m_adress), m_original_code.size(), old_protection, &dummy_protection);
-}
-
-void NametagsRange::disable()
-{
-    using namespace helpers::memory_operarions;
-
-    DWORD old_protection{}, dummy_protection{};
-
-    VirtualProtect(reinterpret_cast<LPVOID>(m_adress), m_original_code.size(), PAGE_EXECUTE_READWRITE, &old_protection);
-    write_bytes(reinterpret_cast<void*>(m_adress), m_original_code);
-    VirtualProtect(reinterpret_cast<LPVOID>(m_adress), m_original_code.size(), old_protection, &dummy_protection);
 }
 
 __attribute__((naked)) void NametagsRange::codecave()

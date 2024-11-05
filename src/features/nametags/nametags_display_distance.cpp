@@ -15,30 +15,9 @@ const uintptr_t renddx9_plus_0x00130365 = constants::modules::get_renddx9_addres
 
 }  // namespace
 
-NametagsDisplayDistance::NametagsDisplayDistance() : FeatureCommon(renddx9_plus_0x00130357, { 0x8B, 0x8E, 0xB8, 0x00, 0x00, 0x00 })
+NametagsDisplayDistance::NametagsDisplayDistance()
+    : FeatureCommon(renddx9_plus_0x00130357, {0x8B, 0x8E, 0xB8, 0x00, 0x00, 0x00}, &NametagsDisplayDistance::codecave)
 {
-}
-
-void NametagsDisplayDistance::enable()
-{
-    using namespace helpers::memory_operarions;
-
-    DWORD old_protection{}, dummy_protection{};
-
-    VirtualProtect(reinterpret_cast<LPVOID>(m_adress), m_original_code.size(), PAGE_EXECUTE_READWRITE, &old_protection);
-    write_jump(reinterpret_cast<void*>(m_adress), reinterpret_cast<void*>(&NametagsDisplayDistance::codecave), m_original_code.size());
-    VirtualProtect(reinterpret_cast<LPVOID>(m_adress), m_original_code.size(), old_protection, &dummy_protection);
-}
-
-void NametagsDisplayDistance::disable()
-{
-    using namespace helpers::memory_operarions;
-
-    DWORD old_protection{}, dummy_protection{};
-
-    VirtualProtect(reinterpret_cast<LPVOID>(m_adress), m_original_code.size(), PAGE_EXECUTE_READWRITE, &old_protection);
-    write_bytes(reinterpret_cast<void*>(m_adress), m_original_code);
-    VirtualProtect(reinterpret_cast<LPVOID>(m_adress), m_original_code.size(), old_protection, &dummy_protection);
 }
 
 __attribute__((naked)) void NametagsDisplayDistance::codecave()

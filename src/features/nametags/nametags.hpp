@@ -17,8 +17,6 @@ class Nametags : public FeatureCommon
 {
 public:
     Nametags();
-    void enable() override;
-    void disable() override;
 
 private:
     __attribute__((naked)) static void codecave();

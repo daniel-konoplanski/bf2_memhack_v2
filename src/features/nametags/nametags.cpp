@@ -12,30 +12,8 @@ const uintptr_t renddx9_plus_0x0012EDF8 = constants::modules::get_renddx9_addres
 
 }  // namespace
 
-Nametags::Nametags() : FeatureCommon(renddx9_plus_0x0012EDC2, {0x8B, 0x86, 0xB8, 0x00, 0x00, 0x00})
+Nametags::Nametags() : FeatureCommon(renddx9_plus_0x0012EDC2, {0x8B, 0x86, 0xB8, 0x00, 0x00, 0x00}, &Nametags::codecave)
 {
-}
-
-void Nametags::enable()
-{
-    using namespace helpers::memory_operarions;
-
-    DWORD old_protection{}, dummy_protection{};
-
-    VirtualProtect(reinterpret_cast<LPVOID>(m_adress), m_original_code.size(), PAGE_EXECUTE_READWRITE, &old_protection);
-    write_jump(reinterpret_cast<void*>(m_adress), reinterpret_cast<void*>(&Nametags::codecave), m_original_code.size());
-    VirtualProtect(reinterpret_cast<LPVOID>(m_adress), m_original_code.size(), old_protection, &dummy_protection);
-}
-
-void Nametags::disable()
-{
-    using namespace helpers::memory_operarions;
-
-    DWORD old_protection{}, dummy_protection{};
-
-    VirtualProtect(reinterpret_cast<LPVOID>(m_adress), m_original_code.size(), PAGE_EXECUTE_READWRITE, &old_protection);
-    write_bytes(reinterpret_cast<void*>(m_adress), m_original_code);
-    VirtualProtect(reinterpret_cast<LPVOID>(m_adress), m_original_code.size(), old_protection, &dummy_protection);
 }
 
 __attribute__((naked)) void Nametags::codecave()
