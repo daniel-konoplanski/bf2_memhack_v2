@@ -1,18 +1,18 @@
 #include <cstdint>
-
 #include <windows.h>
-#include <constants/module_addresses.hpp>
+
 #include <constants/constants.hpp>
+#include <constants/module_addresses.hpp>
 #include <features/nametags/nametags_manager.hpp>
 
 DWORD __stdcall cheatloop(LPVOID lpParam)
 {
-	bool nametag_enabled{ false };
+    bool nametag_enabled{false};
     using namespace managers;
 
-    NametagsManagerPtr nametagsManager{ std::make_unique<NametagsManager>() };
+    NametagsManagerPtr nametagsManager{std::make_unique<NametagsManager>()};
 
-	SHORT previousState{0};
+    SHORT previousState{0};
 
     while (true)
     {
