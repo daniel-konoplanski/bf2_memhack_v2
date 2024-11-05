@@ -6,13 +6,13 @@ namespace features::minimap
 namespace
 {
 
-const uintptr_t renddx9_plus_0x00783C52 = constants::modules::get_renddx9_address() + 0x00783C52;
-const uintptr_t renddx9_plus_0x00783C58 = constants::modules::get_renddx9_address() + 0x00783C58;
+constexpr uintptr_t address_0x00783C52 = 0x00783C52;
+constexpr uintptr_t address_0x00783C58 = 0x00783C58;
 
 }  // namespace
 
 KitIcons::KitIcons()
-    : FeatureCommon(renddx9_plus_0x00783C52, {0x8A, 0x8E, 0x8D, 0x03, 0x00, 0x00}, &KitIcons::codecave) {}
+    : FeatureCommon(address_0x00783C52, {0x8A, 0x8E, 0x8D, 0x03, 0x00, 0x00}, &KitIcons::codecave) {}
 
 __attribute__((naked)) void KitIcons::codecave()
 {
@@ -24,7 +24,7 @@ __attribute__((naked)) void KitIcons::codecave()
 
         ".att_syntax;"
         :
-        : "m"(renddx9_plus_0x00783C58)
+        : "m"(address_0x00783C58)
     );
 }
 

@@ -11,7 +11,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Add the source files for the library
-
 set(SOURCES
     src/main.cpp
     src/helpers/memory_operations.cpp
@@ -29,12 +28,11 @@ set(SOURCES
     src/features/minimap/minimap_manager.cpp
 )
 
-# Create the DLL (shared library)
+# Create the shared library
 add_library(bf2memhack SHARED ${SOURCES})
 
 set_target_properties(bf2memhack PROPERTIES OUTPUT_NAME "bf2memhack" SUFFIX ".dll" PREFIX "")
 
-# Include MinGW headers
 include_directories(
     ${CMAKE_SOURCE_DIR}/src
 )

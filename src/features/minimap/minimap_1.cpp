@@ -6,15 +6,15 @@ namespace features::minimap
 namespace
 {
 
-const uintptr_t renddx9_plus_0x007786CF = constants::modules::get_renddx9_address() + 0x007786CF;
-const uintptr_t renddx9_plus_0x007786DB = constants::modules::get_renddx9_address() + 0x007786DB;
-const uintptr_t renddx9_plus_0x00778846 = constants::modules::get_renddx9_address() + 0x00778846;
-const uintptr_t renddx9_plus_0x007786E7 = constants::modules::get_renddx9_address() + 0x007786E7;
+constexpr uintptr_t address_0x007786CF = 0x007786CF;
+constexpr uintptr_t address_0x007786DB = 0x007786DB;
+constexpr uintptr_t address_0x00778846 = 0x00778846;
+constexpr uintptr_t address_0x007786E7 = 0x007786E7;
 
 }  // namespace
 
 Minimap1::Minimap1()
-    : FeatureCommon(renddx9_plus_0x007786CF, {0x85, 0xDB, 0x0F, 0x84, 0x6F, 0x01, 0x00, 0x00}, &Minimap1::codecave) {}
+    : FeatureCommon(address_0x007786CF, {0x85, 0xDB, 0x0F, 0x84, 0x6F, 0x01, 0x00, 0x00}, &Minimap1::codecave) {}
 
 __attribute__((naked)) void Minimap1::codecave()
 {
@@ -35,7 +35,7 @@ __attribute__((naked)) void Minimap1::codecave()
 
         ".att_syntax;"
         :
-        : "m"(renddx9_plus_0x007786DB), "m"(renddx9_plus_0x00778846), "m"(renddx9_plus_0x007786E7)
+        : "m"(address_0x007786DB), "m"(address_0x00778846), "m"(address_0x007786E7)
     );
 }
 

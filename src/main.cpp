@@ -1,3 +1,4 @@
+#include "features/minimap/minimap_manager.hpp"
 #include <cstdint>
 #include <windows.h>
 
@@ -7,18 +8,23 @@
 
 DWORD __stdcall cheatloop(LPVOID lpParam)
 {
-    bool nametag_enabled{false};
     using namespace managers;
 
     NametagsManagerPtr nametagsManager{std::make_unique<NametagsManager>()};
+    MinimapManagerPtr minimapManager{std::make_unique<MinimapManager>()};
 
-    SHORT previousState{0};
+    bool nametag_enabled{false};
+    bool minimap_enabled{false};
+
+    SHORT previous_state_f10{0};
+    SHORT previous_state_f11{0};
 
     while (true)
     {
-        SHORT currentState = GetAsyncKeyState(VK_F10);
+        SHORT current_state_f10 = GetAsyncKeyState(VK_F10);
+        SHORT current_state_f11 = GetAsyncKeyState(VK_F11);
 
-        if ((currentState & 0x8000) && !(previousState & 0x8000))
+        if ((current_state_f10 & 0x8000) && !(previous_state_f10 & 0x8000))
         {
             nametag_enabled ^= true;
 
@@ -28,7 +34,18 @@ DWORD __stdcall cheatloop(LPVOID lpParam)
                 nametagsManager->disable();
         }
 
-        previousState = currentState;
+        if ((current_state_f11 & 0x8000) && !(previous_state_f11 & 0x8000))
+        {
+            minimap_enabled ^= true;
+
+            if (minimap_enabled)
+                minimapManager->enable();
+            else
+                minimapManager->disable();
+        }
+
+        previous_state_f10 = current_state_f10;
+        previous_state_f11 = current_state_f11;
 
         Sleep(constants::KEY_POLL_VAL_MS);
     }
