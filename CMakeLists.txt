@@ -25,6 +25,8 @@ set(SOURCES
     src/features/minimap/minimap_1.cpp
     src/features/minimap/minimap_4.cpp
     src/features/minimap/minimap_7.cpp
+    src/features/minimap/kit_icons.cpp
+    src/features/minimap/minimap_manager.cpp
 )
 
 # Create the DLL (shared library)
