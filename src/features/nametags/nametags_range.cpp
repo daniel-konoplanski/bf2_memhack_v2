@@ -1,7 +1,8 @@
-#include <constants/module_addresses.hpp>
-#include <helpers/memory_operations.hpp>
-
 #include "nametags_range.hpp"
+
+#include <constants/module_addresses.hpp>
+#include <constants/constants.hpp>
+#include <helpers/memory_operations.hpp>
 
 namespace features::nametags
 {
@@ -9,10 +10,9 @@ namespace features::nametags
 namespace
 {
 
-constexpr DWORD range = 0x44160000; // TODO: could be replaced with a 32 bit float
+const uintptr_t range_adress = reinterpret_cast<uintptr_t>(&constants::RANGE);
 const uintptr_t renddx9_plus_0x0012EEF7 = constants::modules::get_renddx9_address() + 0x0012EEF7;
 const uintptr_t renddx9_plus_0x0012EEFD = constants::modules::get_renddx9_address() + 0x0012EEFD;
-const uintptr_t range_adress = reinterpret_cast<uintptr_t>(&range);
 
 }  // namespace
 
@@ -26,11 +26,11 @@ __attribute__((naked)) void NametagsRange::codecave()
     asm volatile (
         ".intel_syntax noprefix;"
 
-        "fld dword ptr [%0];"                                     // Load the float value at address range_adr into the FPU stack
-        "jmp DWORD PTR [%1];"                                     // Jump to the address stored in renddx9_plus_0x0012EEFD
-        ".att_syntax;"                    
+        "fld dword ptr [%0];"
+        "jmp dword ptr [%1];"
+        ".att_syntax;"
         :
-        : "m"(range_adress), "m"(renddx9_plus_0x0012EEFD)         // Load RendDX9_0x0012EEFD into a register as a runtime address
+        : "m"(range_adress), "m"(renddx9_plus_0x0012EEFD)
     );
 }
 

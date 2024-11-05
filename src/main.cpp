@@ -1,9 +1,9 @@
 #include <cstdint>
+
 #include <windows.h>
 #include <constants/module_addresses.hpp>
+#include <constants/constants.hpp>
 #include <features/nametags/nametags_manager.hpp>
-
-static constexpr uint32_t KEY_POLL_VAL_MS{50};
 
 DWORD __stdcall cheatloop(LPVOID lpParam)
 {
@@ -30,7 +30,7 @@ DWORD __stdcall cheatloop(LPVOID lpParam)
 
         previousState = currentState;
 
-        Sleep(KEY_POLL_VAL_MS);
+        Sleep(constants::KEY_POLL_VAL_MS);
     }
 
     return 0;

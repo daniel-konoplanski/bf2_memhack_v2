@@ -23,18 +23,18 @@ NametagsDisplayDistance::NametagsDisplayDistance()
 __attribute__((naked)) void NametagsDisplayDistance::codecave()
 {
     asm volatile (
-        ".intel_syntax noprefix;"                                   // Switch to Intel syntax for readability
+        ".intel_syntax noprefix;"            
 
-        "mov ecx, DWORD PTR [esi + 0xB8];"                          // MOV ECX, DWORD PTR DS:[ESI + 0xB8]
-        "shr ecx, 0x3;"                                             // SHR ECX, 0x3
-        "test cl, 0x1;"                                             // TEST CL, 0x1
-        "jne LABEL1;"                                               // Jump to LABEL1 if the test result is non-zero
-        "jmp DWORD PTR [%0];"                                       // Jump to RendDX9_0x00130365 if the test fails
+        "mov ecx, dword ptr [esi + 0xB8];"                        
+        "shr ecx, 0x3;"                                             
+        "test cl, 0x1;"                                             
+        "jne LABEL1;"                                               
+        "jmp dword ptr [%0];"
 
-        "LABEL1:"                                                   // LABEL1
-        "jmp DWORD PTR [%1];"                                       // Jump to RendDX9_0x001303D5
+        "LABEL1:"
+        "jmp dword ptr [%1];"
 
-        ".att_syntax;"                                              // Switch back to AT&T syntax
+        ".att_syntax;"       
         :
         : "m"(renddx9_plus_0x00130365), "m"(renddx9_plus_0x001303D5)
     );

@@ -35,9 +35,9 @@ __attribute__((naked)) void Nametags::codecave()
         "call [eax + 0x68];"              // CALL DWORD PTR DS:[EAX + 0x68]
         "test al, al;"                    // TEST AL, AL
         "je LABEL1;"                      // JE LABEL1
-        "jmp DWORD PTR [%0];"             // JMP to the address RendDX9_0x0012EDF8
+        "jmp dword ptr [%0];"             // JMP to the address RendDX9_0x0012EDF8
         "LABEL1:"
-        "jmp DWORD PTR [%1];"             // JMP to the address RendDX9_0x0012EEEB
+        "jmp dword ptr [%1];"             // JMP to the address RendDX9_0x0012EEEB
 
         ".att_syntax;"                    // Switch back to AT&T syntax
         :

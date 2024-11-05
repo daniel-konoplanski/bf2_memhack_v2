@@ -1,4 +1,5 @@
 #include <constants/module_addresses.hpp>
+#include <constants/constants.hpp>
 #include <helpers/memory_operations.hpp>
 
 #include "nametags_distance_range.hpp"
@@ -9,8 +10,7 @@ namespace features::nametags
 namespace
 {
 
-constexpr float range{ 2000.0f };
-const uintptr_t range_address{ reinterpret_cast<uintptr_t>(&range) };
+const uintptr_t range_address{ reinterpret_cast<uintptr_t>(&constants::RANGE) };
 const uintptr_t renddx9_plus_0x00130368 = constants::modules::get_renddx9_address() + 0x00130368;
 const uintptr_t renddx9_plus_0x0013036E  = constants::modules::get_renddx9_address() + 0x0013036E;
 
@@ -24,12 +24,12 @@ NametagsDistanceRange::NametagsDistanceRange()
 __attribute__((naked)) void NametagsDistanceRange::codecave()
 {
     asm volatile (
-        ".intel_syntax noprefix;"                                   // Switch to Intel syntax
+        ".intel_syntax noprefix;"
 
-        "fcomp DWORD PTR [%0];"
-        "jmp DWORD PTR [%1];"
+        "fcomp dword ptr [%0];"
+        "jmp dword ptr [%1];"
 
-        ".att_syntax;"                                              // Switch back to AT&T syntax
+        ".att_syntax;"
         :
         : "m"(range_address), "m"(renddx9_plus_0x0013036E)
     );
