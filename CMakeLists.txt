@@ -23,6 +23,8 @@ set(SOURCES
     src/features/nametags/nametags_distance_range.cpp
     src/features/nametags/nametags_manager.cpp
     src/features/minimap/minimap_1.cpp
+    src/features/minimap/minimap_4.cpp
+    src/features/minimap/minimap_7.cpp
 )
 
 # Create the DLL (shared library)
