@@ -47,10 +47,12 @@ HRESULT __stdcall hk_endscene(IDirect3DDevice9* device)
     ImGui::SetNextWindowPos(ImVec2(400, 300), ImGuiCond_FirstUseEver);
 
     // Set the initial size to 800x600 pixels
-    ImGui::SetNextWindowSize(ImVec2(250, 250), ImGuiCond_Always);
+    ImGui::SetNextWindowSize(ImVec2(250, 250), ImGuiCond_FirstUseEver);
+
+    // Begin the ImGui window (resizable and movable)
+    ImGui::Begin("Example Window", nullptr, ImGuiWindowFlags_None);
 
     // Your ImGui rendering code
-    ImGui::Begin("Example Window");
     ImGui::Text("Hello, ImGui!");
     ImGui::End();
 
