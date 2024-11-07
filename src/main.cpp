@@ -1,10 +1,54 @@
-#include "features/minimap/minimap_manager.hpp"
 #include <cstdint>
+#include <fstream>
 #include <windows.h>
+#include <d3d9.h>
+#include <d3d9types.h>
+#include <d3dx9.h>
 
 #include <constants/constants.hpp>
 #include <constants/module_addresses.hpp>
 #include <features/nametags/nametags_manager.hpp>
+#include <features/minimap/minimap_manager.hpp>
+#include <helpers/hooking.hpp>
+
+#include <imgui/backends/imgui_impl_dx9.h>
+
+#include <fstream>
+
+using helpers::hooking::EndSceneFn;
+
+EndSceneFn g_oendscene{};
+
+HRESULT __stdcall hk_endscene(IDirect3DDevice9* device)
+{
+    static bool is_initialized{};
+
+    if (!is_initialized)
+    {
+        // ImGui_ImplDX9_Init(device);
+        is_initialized = true;
+    }
+
+    return g_oendscene(device);
+}
+
+void __stdcall hook_endscene(void* endscene_address)
+{
+    // Initialize MinHook
+    if (MH_Initialize() != MH_OK)
+        return;
+
+    // Create the hook for EndScene
+    if (MH_CreateHook(endscene_address, reinterpret_cast<LPVOID>(&hk_endscene),
+                      reinterpret_cast<LPVOID*>(&g_oendscene)) != MH_OK)
+    {
+        return;
+    }
+
+    // Enable the hook
+    if (MH_EnableHook(endscene_address) != MH_OK)
+        return;
+}
 
 DWORD __stdcall cheatloop(LPVOID lpParam)
 {
@@ -18,6 +62,10 @@ DWORD __stdcall cheatloop(LPVOID lpParam)
 
     SHORT previous_state_f10{0};
     SHORT previous_state_f11{0};
+
+    void* endscene_address = helpers::hooking::get_endscene_address();
+
+    hook_endscene(endscene_address);
 
     while (true)
     {

@@ -13,7 +13,6 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # Add the source files for the library
 set(SOURCES
     src/main.cpp
-    src/helpers/memory_operations.cpp
     src/constants/module_addresses.cpp
     src/features/feature_common.cpp
     src/features/nametags/nametags.cpp
@@ -26,15 +25,50 @@ set(SOURCES
     src/features/minimap/minimap_7.cpp
     src/features/minimap/kit_icons.cpp
     src/features/minimap/minimap_manager.cpp
+    src/helpers/memory_operations.cpp
+    src/helpers/hooking.cpp
 )
 
+set(IMGUI_DIR ${CMAKE_SOURCE_DIR}/external/imgui)
+
+set(IMGUI_SOURCES
+    ${IMGUI_DIR}/imgui.cpp
+    ${IMGUI_DIR}/imgui_draw.cpp
+    ${IMGUI_DIR}/imgui_tables.cpp
+    ${IMGUI_DIR}/imgui_widgets.cpp
+    ${IMGUI_DIR}/imgui_demo.cpp
+)
+
+set(IMGUI_BACKENDS
+    ${IMGUI_DIR}/backends/imgui_impl_dx9.cpp
+    ${IMGUI_DIR}/backends/imgui_impl_win32.cpp
+)
+
+set(ALL_SOURCES ${SOURCES} ${IMGUI_SOURCES} ${IMGUI_BACKENDS})
+
 # Create the shared library
-add_library(bf2memhack SHARED ${SOURCES})
+add_library(bf2memhack SHARED ${ALL_SOURCES})
 
 set_target_properties(bf2memhack PROPERTIES OUTPUT_NAME "bf2memhack" SUFFIX ".dll" PREFIX "")
 
 include_directories(
     ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/external
 )
 
+target_include_directories(bf2memhack PRIVATE ${IMGUI_DIR} ${IMGUI_DIR}/backends)
+
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libgcc -static-libstdc++")
+
+add_library(MinHook STATIC IMPORTED)
+
+set_target_properties(MinHook PROPERTIES
+    IMPORTED_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/external/minhook/lib/libMinHook.a"
+    INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/external/minhook/include"
+)
+
+target_link_libraries(bf2memhack PRIVATE
+    MinHook
+    d3d9
+    gdi32
+    dwmapi)
