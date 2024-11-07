@@ -5,15 +5,16 @@
 #include <d3d9types.h>
 #include <d3dx9.h>
 
+#include <imgui/imgui.h>
+#include <imgui/backends/imgui_impl_win32.h>
+#include <imgui/backends/imgui_impl_dx9.h>
+
 #include <constants/constants.hpp>
 #include <constants/module_addresses.hpp>
 #include <features/nametags/nametags_manager.hpp>
 #include <features/minimap/minimap_manager.hpp>
 #include <helpers/hooking.hpp>
-
-#include <imgui/backends/imgui_impl_dx9.h>
-
-#include <fstream>
+#include <helpers/windows.hpp>
 
 using helpers::hooking::EndSceneFn;
 
@@ -21,13 +22,42 @@ EndSceneFn g_oendscene{};
 
 HRESULT __stdcall hk_endscene(IDirect3DDevice9* device)
 {
-    static bool is_initialized{};
+    static bool is_initialized{false};
 
     if (!is_initialized)
     {
-        // ImGui_ImplDX9_Init(device);
+        ImGui::CreateContext();
+        HWND main_window_handle = helpers::windows::get_main_window_handle();
+
+        if (!ImGui_ImplWin32_Init(main_window_handle))
+            return g_oendscene(device);
+
+        if (!ImGui_ImplDX9_Init(device))
+            return g_oendscene(device);
+
         is_initialized = true;
     }
+
+    // Start the ImGui frame
+    ImGui_ImplDX9_NewFrame();
+    ImGui_ImplWin32_NewFrame();
+    ImGui::NewFrame();
+
+    // Optionally set window position
+    ImGui::SetNextWindowPos(ImVec2(400, 300), ImGuiCond_FirstUseEver);
+
+    // Set the initial size to 800x600 pixels
+    ImGui::SetNextWindowSize(ImVec2(250, 250), ImGuiCond_Always);
+
+    // Your ImGui rendering code
+    ImGui::Begin("Example Window");
+    ImGui::Text("Hello, ImGui!");
+    ImGui::End();
+
+    // Render ImGui
+    ImGui::EndFrame();
+    ImGui::Render();
+    ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
 
     return g_oendscene(device);
 }

@@ -27,6 +27,7 @@ set(SOURCES
     src/features/minimap/minimap_manager.cpp
     src/helpers/memory_operations.cpp
     src/helpers/hooking.cpp
+    src/helpers/windows.cpp
 )
 
 set(IMGUI_DIR ${CMAKE_SOURCE_DIR}/external/imgui)
