@@ -10,6 +10,7 @@ namespace helpers::hooking
 {
 
 using EndSceneFn = HRESULT(__stdcall*)(IDirect3DDevice9*);
+using WndProcFn = LRESULT(__stdcall*)(HWND, UINT, WPARAM, LPARAM);
 
 void* get_endscene_address();
 

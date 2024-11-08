@@ -5,6 +5,6 @@
 namespace helpers::windows
 {
 
-HWND get_main_window_handle();
+HWND __stdcall get_main_window_handle();
 
 }  // namespace helpers::windows

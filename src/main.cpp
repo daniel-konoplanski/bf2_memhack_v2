@@ -16,9 +16,13 @@
 #include <helpers/hooking.hpp>
 #include <helpers/windows.hpp>
 
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
 using helpers::hooking::EndSceneFn;
+using helpers::hooking::WndProcFn;
 
 EndSceneFn g_oendscene{};
+WndProcFn g_owndproc{};
 
 HRESULT __stdcall hk_endscene(IDirect3DDevice9* device)
 {
@@ -43,17 +47,9 @@ HRESULT __stdcall hk_endscene(IDirect3DDevice9* device)
     ImGui_ImplWin32_NewFrame();
     ImGui::NewFrame();
 
-    // Optionally set window position
     ImGui::SetNextWindowPos(ImVec2(400, 300), ImGuiCond_FirstUseEver);
-
-    // Set the initial size to 800x600 pixels
     ImGui::SetNextWindowSize(ImVec2(250, 250), ImGuiCond_FirstUseEver);
-
-    // Begin the ImGui window (resizable and movable)
-    ImGui::Begin("Example Window", nullptr, ImGuiWindowFlags_None);
-
-    // Your ImGui rendering code
-    ImGui::Text("Hello, ImGui!");
+    ImGui::Begin("BF2_MEMHACK MENU", nullptr, ImGuiWindowFlags_None);
     ImGui::End();
 
     // Render ImGui
@@ -64,22 +60,36 @@ HRESULT __stdcall hk_endscene(IDirect3DDevice9* device)
     return g_oendscene(device);
 }
 
-void __stdcall hook_endscene(void* endscene_address)
+LRESULT __stdcall hk_wndproc(HWND hwnd, UINT msg, WPARAM w_param, LPARAM l_param)
 {
-    // Initialize MinHook
-    if (MH_Initialize() != MH_OK)
+    if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, w_param, l_param))
+        return true;
+
+    return CallWindowProc(g_owndproc, hwnd, msg, w_param, l_param);
+}
+
+void __stdcall hook_functions()
+{
+    HWND main_window_handle = helpers::windows::get_main_window_handle();
+
+    LPVOID endscene_address = helpers::hooking::get_endscene_address();
+    LPVOID wndproc_address = reinterpret_cast<LPVOID>(GetWindowLongPtr(main_window_handle, GWLP_WNDPROC));
+    LPVOID hk_endscene_address = reinterpret_cast<LPVOID>(&hk_endscene);
+    LPVOID hk_wndproc_address = reinterpret_cast<LPVOID>(&hk_wndproc);
+
+    MH_STATUS initialize_result = MH_Initialize();
+
+    if (initialize_result != MH_OK)
         return;
 
-    // Create the hook for EndScene
-    if (MH_CreateHook(endscene_address, reinterpret_cast<LPVOID>(&hk_endscene),
-                      reinterpret_cast<LPVOID*>(&g_oendscene)) != MH_OK)
-    {
-        return;
-    }
+    MH_STATUS endscene_hook_result = MH_CreateHook(endscene_address, hk_endscene_address, reinterpret_cast<LPVOID *>(&g_oendscene));
+    MH_STATUS wndproc_hook_result = MH_CreateHook(wndproc_address, hk_wndproc_address, reinterpret_cast<LPVOID*>(&g_owndproc));
 
-    // Enable the hook
-    if (MH_EnableHook(endscene_address) != MH_OK)
+    if ((endscene_hook_result != MH_OK) || (wndproc_hook_result != MH_OK))
         return;
+
+    MH_STATUS enable_endscene_result = MH_EnableHook(endscene_address);
+    MH_STATUS enable_wndproc_result = MH_EnableHook(wndproc_address);
 }
 
 DWORD __stdcall cheatloop(LPVOID lpParam)
@@ -95,9 +105,7 @@ DWORD __stdcall cheatloop(LPVOID lpParam)
     SHORT previous_state_f10{0};
     SHORT previous_state_f11{0};
 
-    void* endscene_address = helpers::hooking::get_endscene_address();
-
-    hook_endscene(endscene_address);
+    hook_functions();
 
     while (true)
     {

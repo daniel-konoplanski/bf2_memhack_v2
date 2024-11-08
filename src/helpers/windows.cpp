@@ -22,7 +22,7 @@ BOOL __stdcall enum_windows_proc(HWND hwnd, LPARAM lParam)
 
 }  // namespace
 
-HWND get_main_window_handle()
+HWND __stdcall get_main_window_handle()
 {
     HWND hwnd = NULL;
     EnumWindows(enum_windows_proc, reinterpret_cast<LPARAM>(&hwnd));
