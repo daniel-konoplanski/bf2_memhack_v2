@@ -1,5 +1,6 @@
+#include <atomic>
 #include <cstdint>
-#include <fstream>
+#include <minwindef.h>
 #include <windows.h>
 #include <d3d9.h>
 #include <d3d9types.h>
@@ -15,6 +16,7 @@
 #include <features/minimap/minimap_manager.hpp>
 #include <helpers/hooking.hpp>
 #include <helpers/windows.hpp>
+#include <winnt.h>
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -24,46 +26,103 @@ using helpers::hooking::WndProcFn;
 EndSceneFn g_oendscene{};
 WndProcFn g_owndproc{};
 
-HRESULT __stdcall hk_endscene(IDirect3DDevice9* device)
+std::atomic<bool> g_show_ui{false};
+std::atomic<bool> g_enable_nametags{false};
+std::atomic<bool> g_enable_maphack{false};
+
+auto g_nametag_manager = managers::NametagsManager{};
+auto g_minimap_manager = managers::MinimapManager{};
+
+bool __stdcall initialize_imgui(IDirect3DDevice9* device)
 {
-    static bool is_initialized{false};
+    ImGui::CreateContext();
 
-    if (!is_initialized)
-    {
-        ImGui::CreateContext();
-        HWND main_window_handle = helpers::windows::get_main_window_handle();
+    ImGuiIO &io = ImGui::GetIO();
+    io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 
-        if (!ImGui_ImplWin32_Init(main_window_handle))
-            return g_oendscene(device);
+    HWND main_window_handle = helpers::windows::get_main_window_handle();
 
-        if (!ImGui_ImplDX9_Init(device))
-            return g_oendscene(device);
+    if (!ImGui_ImplWin32_Init(main_window_handle))
+      return false;
 
-        is_initialized = true;
-    }
+    if (!ImGui_ImplDX9_Init(device))
+      return false;
 
-    // Start the ImGui frame
+    return true;
+}
+
+void __stdcall render_imgui_ui()
+{
     ImGui_ImplDX9_NewFrame();
     ImGui_ImplWin32_NewFrame();
     ImGui::NewFrame();
 
-    ImGui::SetNextWindowPos(ImVec2(400, 300), ImGuiCond_FirstUseEver);
-    ImGui::SetNextWindowSize(ImVec2(250, 250), ImGuiCond_FirstUseEver);
-    ImGui::Begin("BF2_MEMHACK MENU", nullptr, ImGuiWindowFlags_None);
+    ImGui::SetNextWindowPos(ImVec2(100, 100), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSizeConstraints(ImVec2(0, 0), ImVec2(FLT_MAX, FLT_MAX));
+    ImGui::Begin("BF2_MEMHACK MENU", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize);
+
+    bool enable_nametags{g_enable_nametags.load()};
+    bool enable_maphack{g_enable_maphack.load()};
+
+    if(ImGui::Checkbox("Enable Nametags", &enable_nametags))
+    {
+        g_enable_nametags.store(enable_nametags);
+
+        if (g_enable_nametags.load())
+            g_nametag_manager.enable();
+        else
+            g_nametag_manager.disable();
+    }
+
+    if(ImGui::Checkbox("Enable Maphack", &enable_maphack))
+    {
+        g_enable_maphack.store(enable_maphack);
+
+        if (g_enable_maphack.load())
+            g_minimap_manager.enable();
+        else
+            g_minimap_manager.disable();
+    }
+
     ImGui::End();
 
-    // Render ImGui
+    ImGui::SetWindowFocus("BF2_MEMHACK MENU");
+
     ImGui::EndFrame();
     ImGui::Render();
     ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
+}
+
+HRESULT __stdcall hk_endscene(IDirect3DDevice9* device)
+{
+    static bool is_ui_initialized{false};
+
+    if (!is_ui_initialized)
+    {
+        bool initialization_result = initialize_imgui(device);
+
+        if (!initialization_result)
+            return g_oendscene(device);
+
+        is_ui_initialized = true;
+    }
+
+    if (!g_show_ui.load())
+        return g_oendscene(device);
+
+    render_imgui_ui();
 
     return g_oendscene(device);
 }
 
 LRESULT __stdcall hk_wndproc(HWND hwnd, UINT msg, WPARAM w_param, LPARAM l_param)
 {
-    if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, w_param, l_param))
-        return true;
+    if (g_show_ui.load())
+    {
+        if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, w_param, l_param))
+            return 0;
+    }
 
     return CallWindowProc(g_owndproc, hwnd, msg, w_param, l_param);
 }
@@ -71,69 +130,45 @@ LRESULT __stdcall hk_wndproc(HWND hwnd, UINT msg, WPARAM w_param, LPARAM l_param
 void __stdcall hook_functions()
 {
     HWND main_window_handle = helpers::windows::get_main_window_handle();
-
     LPVOID endscene_address = helpers::hooking::get_endscene_address();
-    LPVOID wndproc_address = reinterpret_cast<LPVOID>(GetWindowLongPtr(main_window_handle, GWLP_WNDPROC));
     LPVOID hk_endscene_address = reinterpret_cast<LPVOID>(&hk_endscene);
-    LPVOID hk_wndproc_address = reinterpret_cast<LPVOID>(&hk_wndproc);
 
     MH_STATUS initialize_result = MH_Initialize();
 
     if (initialize_result != MH_OK)
         return;
 
-    MH_STATUS endscene_hook_result = MH_CreateHook(endscene_address, hk_endscene_address, reinterpret_cast<LPVOID *>(&g_oendscene));
-    MH_STATUS wndproc_hook_result = MH_CreateHook(wndproc_address, hk_wndproc_address, reinterpret_cast<LPVOID*>(&g_owndproc));
+    MH_STATUS endscene_hook_result = MH_CreateHook(endscene_address, hk_endscene_address, reinterpret_cast<LPVOID*>(&g_oendscene));
 
-    if ((endscene_hook_result != MH_OK) || (wndproc_hook_result != MH_OK))
+    if ((endscene_hook_result != MH_OK))
         return;
 
     MH_STATUS enable_endscene_result = MH_EnableHook(endscene_address);
-    MH_STATUS enable_wndproc_result = MH_EnableHook(wndproc_address);
+
+    LONG_PTR original_wndproc_address = SetWindowLongPtr(main_window_handle, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(hk_wndproc));
+
+    if (!original_wndproc_address)
+        return;
+
+    g_owndproc = reinterpret_cast<WndProcFn>(original_wndproc_address);
 }
 
-DWORD __stdcall cheatloop(LPVOID lpParam)
+DWORD __stdcall cheatloop(LPVOID)
 {
-    using namespace managers;
-
-    NametagsManagerPtr nametagsManager{std::make_unique<NametagsManager>()};
-    MinimapManagerPtr minimapManager{std::make_unique<MinimapManager>()};
-
-    bool nametag_enabled{false};
-    bool minimap_enabled{false};
-
-    SHORT previous_state_f10{0};
-    SHORT previous_state_f11{0};
-
     hook_functions();
+
+    SHORT previous_state_f12{0};
 
     while (true)
     {
-        SHORT current_state_f10 = GetAsyncKeyState(VK_F10);
-        SHORT current_state_f11 = GetAsyncKeyState(VK_F11);
+        SHORT current_state_f12 = GetAsyncKeyState(VK_F12);
 
-        if ((current_state_f10 & 0x8000) && !(previous_state_f10 & 0x8000))
+        if ((current_state_f12 & 0x8000) && !(previous_state_f12 & 0x8000))
         {
-            nametag_enabled ^= true;
-
-            if (nametag_enabled)
-                nametagsManager->enable();
-            else
-                nametagsManager->disable();
+            g_show_ui.store(!g_show_ui.load());
         }
 
-        if ((current_state_f11 & 0x8000) && !(previous_state_f11 & 0x8000))
-        {
-            minimap_enabled ^= true;
-
-            if (minimap_enabled)
-                minimapManager->enable();
-            else
-                minimapManager->disable();
-        }
-
-        previous_state_f10 = current_state_f10;
-        previous_state_f11 = current_state_f11;
+        previous_state_f12 = current_state_f12;
 
         Sleep(constants::KEY_POLL_VAL_MS);
     }
@@ -141,12 +176,37 @@ DWORD __stdcall cheatloop(LPVOID lpParam)
     return 0;
 }
 
-BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
+void __stdcall on_dll_attach()
 {
-    if (fdwReason == DLL_PROCESS_ATTACH)
+    const char* message_box_text{"dll successfully injected"};
+    const char* message_box_caption{"BF2_MEMHACK"};
+
+    MessageBox(NULL, message_box_text, message_box_caption, MB_OK | MB_ICONINFORMATION);
+    CreateThread(NULL, 0, reinterpret_cast<LPTHREAD_START_ROUTINE>(cheatloop), NULL, 0, NULL);
+}
+
+void __stdcall on_dll_detach()
+{
+    ImGui_ImplDX9_Shutdown();
+    ImGui_ImplWin32_Shutdown();
+    ImGui::DestroyContext();
+
+    MH_DisableHook(MH_ALL_HOOKS);
+    MH_Uninitialize();
+}
+
+BOOL WINAPI DllMain(HINSTANCE hinst_dll, DWORD fdw_reason, LPVOID lpv_reserved)
+{
+    switch (fdw_reason)
     {
-        MessageBox(NULL, "bf2_memhack.dll successfully injected", "Injection Confirmation", MB_OK | MB_ICONINFORMATION);
-        CreateThread(NULL, 0, reinterpret_cast<LPTHREAD_START_ROUTINE>(cheatloop), NULL, 0, NULL);
+        case DLL_PROCESS_ATTACH:
+            on_dll_attach();
+            break;
+        case DLL_PROCESS_DETACH:
+            on_dll_detach();
+            break;
+        default:
+            break;
     }
 
     return true;
