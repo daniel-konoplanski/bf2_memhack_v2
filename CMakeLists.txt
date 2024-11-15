@@ -13,7 +13,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # Add the source files for the library
 set(SOURCES
     src/main.cpp
-    src/constants/module_addresses.cpp
+    src/helpers/module_addresses.cpp
     src/features/feature_common.cpp
     src/features/nametags/nametags.cpp
     src/features/nametags/nametags_range.cpp
@@ -28,6 +28,7 @@ set(SOURCES
     src/helpers/memory_operations.cpp
     src/helpers/hooking.cpp
     src/helpers/windows.cpp
+    src/helpers/bf2_classes.cpp
 )
 
 set(IMGUI_DIR ${CMAKE_SOURCE_DIR}/external/imgui)

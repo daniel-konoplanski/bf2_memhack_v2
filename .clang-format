@@ -18,8 +18,7 @@ AllowAllParametersOfDeclarationOnNextLine: false
 PenaltyBreakBeforeFirstCallParameter: 80
 PenaltyReturnTypeOnItsOwnLine: 1000
 ExperimentalAutoDetectBinPacking: false
-PointerAlignment: Right
+PointerAlignment: Left
 AlwaysBreakTemplateDeclarations: Yes
 AllowShortCaseLabelsOnASingleLine: true
 IndentExternBlock: NoIndent
-InsertNewlineAtEOF: true

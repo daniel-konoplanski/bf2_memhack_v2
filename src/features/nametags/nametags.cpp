@@ -6,9 +6,9 @@ namespace features::nametags
 namespace
 {
 
-const uintptr_t renddx9_plus_0x0012EDC2 = constants::modules::get_renddx9_address() + 0x0012EDC2;
-const uintptr_t renddx9_plus_0x0012EEEB = constants::modules::get_renddx9_address() + 0x0012EEEB;
-const uintptr_t renddx9_plus_0x0012EDF8 = constants::modules::get_renddx9_address() + 0x0012EDF8;
+const uintptr_t renddx9_plus_0x0012EDC2 = helpers::modules::get_renddx9_address() + 0x0012EDC2;
+const uintptr_t renddx9_plus_0x0012EEEB = helpers::modules::get_renddx9_address() + 0x0012EEEB;
+const uintptr_t renddx9_plus_0x0012EDF8 = helpers::modules::get_renddx9_address() + 0x0012EDF8;
 
 }  // namespace
 

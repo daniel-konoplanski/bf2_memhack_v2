@@ -1,4 +1,4 @@
-#include <constants/module_addresses.hpp>
+#include <helpers/module_addresses.hpp>
 #include <constants/constants.hpp>
 #include <helpers/memory_operations.hpp>
 
@@ -11,8 +11,8 @@ namespace
 {
 
 const uintptr_t range_address{ reinterpret_cast<uintptr_t>(&constants::RANGE) };
-const uintptr_t renddx9_plus_0x00130368 = constants::modules::get_renddx9_address() + 0x00130368;
-const uintptr_t renddx9_plus_0x0013036E  = constants::modules::get_renddx9_address() + 0x0013036E;
+const uintptr_t renddx9_plus_0x00130368 = helpers::modules::get_renddx9_address() + 0x00130368;
+const uintptr_t renddx9_plus_0x0013036E  = helpers::modules::get_renddx9_address() + 0x0013036E;
 
 }  // namespace
 

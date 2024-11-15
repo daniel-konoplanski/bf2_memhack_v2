@@ -1,4 +1,4 @@
-#include <constants/module_addresses.hpp>
+#include <helpers/module_addresses.hpp>
 #include <helpers/memory_operations.hpp>
 
 #include "nametags_display_distance.hpp"
@@ -9,9 +9,9 @@ namespace features::nametags
 namespace
 {
 
-const uintptr_t renddx9_plus_0x00130357 = constants::modules::get_renddx9_address() + 0x00130357;
-const uintptr_t renddx9_plus_0x001303D5 = constants::modules::get_renddx9_address() + 0x001303D5;
-const uintptr_t renddx9_plus_0x00130365 = constants::modules::get_renddx9_address() + 0x00130365;
+const uintptr_t renddx9_plus_0x00130357 = helpers::modules::get_renddx9_address() + 0x00130357;
+const uintptr_t renddx9_plus_0x001303D5 = helpers::modules::get_renddx9_address() + 0x001303D5;
+const uintptr_t renddx9_plus_0x00130365 = helpers::modules::get_renddx9_address() + 0x00130365;
 
 }  // namespace
 

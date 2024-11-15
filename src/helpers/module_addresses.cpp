@@ -1,6 +1,6 @@
 #include "module_addresses.hpp"
 
-namespace constants::modules
+namespace helpers::modules
 {
 
 uintptr_t get_renddx9_address()
@@ -9,4 +9,4 @@ uintptr_t get_renddx9_address()
     return renddx9;
 }
 
-}  // namespace constants::asm
+}  // namespace helpers::modules

@@ -6,7 +6,9 @@ namespace features
 {
 
 FeatureCommon::FeatureCommon(uintptr_t adress, std::vector<BYTE>&& original_code, void (*codecave)()) noexcept
-    : m_adress{adress}, m_original_code{original_code}, m_codecave{codecave}
+    : m_adress{adress}
+    , m_original_code{original_code}
+    , m_codecave{codecave}
 {
 }
 

@@ -1,3 +1,4 @@
+#include <MinHook.h>
 #include <atomic>
 #include <cstdint>
 #include <minwindef.h>
@@ -11,20 +12,24 @@
 #include <imgui/backends/imgui_impl_dx9.h>
 
 #include <constants/constants.hpp>
-#include <constants/module_addresses.hpp>
+#include <helpers/module_addresses.hpp>
 #include <features/nametags/nametags_manager.hpp>
 #include <features/minimap/minimap_manager.hpp>
 #include <helpers/hooking.hpp>
 #include <helpers/windows.hpp>
-#include <winnt.h>
+
+#include <fstream>
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+void __stdcall on_dll_detach();
 
 using helpers::hooking::EndSceneFn;
 using helpers::hooking::WndProcFn;
+using helpers::hooking::ResetFn;
 
 EndSceneFn g_oendscene{};
 WndProcFn g_owndproc{};
+ResetFn g_oreset{};
 
 std::atomic<bool> g_show_ui{false};
 std::atomic<bool> g_enable_nametags{false};
@@ -108,6 +113,11 @@ HRESULT __stdcall hk_endscene(IDirect3DDevice9* device)
         is_ui_initialized = true;
     }
 
+    HRESULT result = device->TestCooperativeLevel();
+
+    if (result == D3DERR_DEVICELOST || result == D3DERR_DEVICENOTRESET)
+        return g_oendscene(device);
+
     if (!g_show_ui.load())
         return g_oendscene(device);
 
@@ -118,6 +128,19 @@ HRESULT __stdcall hk_endscene(IDirect3DDevice9* device)
 
 LRESULT __stdcall hk_wndproc(HWND hwnd, UINT msg, WPARAM w_param, LPARAM l_param)
 {
+    // if (msg == WM_KEYDOWN)
+    // {
+    //     switch (w_param)
+    //     {
+    //     case VK_F12:
+    //         g_show_ui.store(!g_show_ui.load());
+    //         break;
+    //     case VK_END:
+    //         on_dll_detach();
+    //         break;
+    //     }
+    // }
+
     if (g_show_ui.load())
     {
         if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, w_param, l_param))
@@ -127,11 +150,27 @@ LRESULT __stdcall hk_wndproc(HWND hwnd, UINT msg, WPARAM w_param, LPARAM l_param
     return CallWindowProc(g_owndproc, hwnd, msg, w_param, l_param);
 }
 
+HRESULT __stdcall hk_reset(IDirect3DDevice9* p_device, D3DPRESENT_PARAMETERS* p_d3dpp)
+{
+    ImGui_ImplDX9_InvalidateDeviceObjects();
+
+    HRESULT hr = g_oreset(p_device, p_d3dpp);
+
+    if (SUCCEEDED(hr))
+    {
+        ImGui_ImplDX9_CreateDeviceObjects();
+    }
+
+    return hr;
+}
+
 void __stdcall hook_functions()
 {
     HWND main_window_handle = helpers::windows::get_main_window_handle();
     LPVOID endscene_address = helpers::hooking::get_endscene_address();
     LPVOID hk_endscene_address = reinterpret_cast<LPVOID>(&hk_endscene);
+    LPVOID reset_address = helpers::hooking::get_reset_address();
+    LPVOID hk_reset_address = reinterpret_cast<LPVOID>(&hk_reset);
 
     MH_STATUS initialize_result = MH_Initialize();
 
@@ -151,6 +190,16 @@ void __stdcall hook_functions()
         return;
 
     g_owndproc = reinterpret_cast<WndProcFn>(original_wndproc_address);
+
+    MH_STATUS reset_hook_result = MH_CreateHook(reset_address, hk_reset_address, reinterpret_cast<LPVOID*>(&g_oreset));
+
+    if ((reset_hook_result != MH_OK))
+        return;
+
+    MH_STATUS reset_endscene_result = MH_EnableHook(reset_address);
+
+    if (reset_endscene_result != MH_OK)
+        return;
 }
 
 DWORD __stdcall cheatloop(LPVOID)

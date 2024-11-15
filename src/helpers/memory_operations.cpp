@@ -47,4 +47,27 @@ void write_bytes(void* source_ptr, const std::vector<BYTE>& data_to_write)
     }
 }
 
+uintptr_t find_pattern(uintptr_t start_offset, uintptr_t size, BYTE* pattern, char mask[])
+{
+    uintptr_t pos{0u};
+    int searchLen = strlen(mask) - 1;
+
+    for (uintptr_t retAddress = start_offset; retAddress < start_offset + size; retAddress++)
+    {
+        if (*reinterpret_cast<BYTE*>(retAddress) == pattern[pos] || mask[pos] == '?')
+        {
+            if (mask[pos + 1] == '\0')
+                return (retAddress - searchLen);
+
+            pos++;
+        }
+        else
+        {
+            pos = 0;
+        }
+    }
+
+    return 0;
+}
+
 }  // namespace helpers::memory_operarions
