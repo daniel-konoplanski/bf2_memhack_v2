@@ -12,6 +12,7 @@
 #include <imgui/backends/imgui_impl_win32.h>
 #include <imgui/backends/imgui_impl_dx9.h>
 
+#include <app_states.hpp>
 #include <constants/constants.hpp>
 #include <helpers/module_addresses.hpp>
 #include <features/nametags/nametags_manager.hpp>
@@ -29,12 +30,6 @@ using helpers::hooking::ResetFn;
 EndSceneFn g_oendscene{};
 WndProcFn g_owndproc{};
 ResetFn g_oreset{};
-
-std::atomic<bool> g_show_ui{false};
-std::atomic<bool> g_enable_nametags{false};
-std::atomic<bool> g_enable_maphack{false};
-std::atomic<bool> g_imgui_initialized{false};
-std::atomic<bool> g_minhook_initialized{false};
 
 auto g_nametag_manager = managers::NametagsManager{};
 auto g_minimap_manager = managers::MinimapManager{};
@@ -68,14 +63,14 @@ void __stdcall render_imgui_ui()
     ImGui::SetNextWindowSizeConstraints(ImVec2(0, 0), ImVec2(FLT_MAX, FLT_MAX));
     ImGui::Begin("BF2_MEMHACK MENU", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize);
 
-    bool enable_nametags{g_enable_nametags.load()};
-    bool enable_maphack{g_enable_maphack.load()};
+    bool enable_nametags{app_states::g_enable_nametags.load()};
+    bool enable_maphack{app_states::g_enable_maphack.load()};
 
     if(ImGui::Checkbox("Enable Nametags", &enable_nametags))
     {
-        g_enable_nametags.store(enable_nametags);
+        app_states::g_enable_nametags.store(enable_nametags);
 
-        if (g_enable_nametags.load())
+        if (app_states::g_enable_nametags.load())
             g_nametag_manager.enable();
         else
             g_nametag_manager.disable();
@@ -83,9 +78,9 @@ void __stdcall render_imgui_ui()
 
     if(ImGui::Checkbox("Enable Maphack", &enable_maphack))
     {
-        g_enable_maphack.store(enable_maphack);
+        app_states::g_enable_maphack.store(enable_maphack);
 
-        if (g_enable_maphack.load())
+        if (app_states::g_enable_maphack.load())
             g_minimap_manager.enable();
         else
             g_minimap_manager.disable();
@@ -102,14 +97,14 @@ void __stdcall render_imgui_ui()
 
 HRESULT __stdcall hk_endscene(IDirect3DDevice9* device)
 {
-    if (!g_imgui_initialized.load())
+    if (!app_states::g_imgui_initialized.load())
     {
         bool initialization_result = initialize_imgui(device);
 
         if (!initialization_result)
             return g_oendscene(device);
 
-        g_imgui_initialized.store(true);
+        app_states::g_imgui_initialized.store(true);
     }
 
     HRESULT result = device->TestCooperativeLevel();
@@ -117,7 +112,7 @@ HRESULT __stdcall hk_endscene(IDirect3DDevice9* device)
     if (result == D3DERR_DEVICELOST || result == D3DERR_DEVICENOTRESET)
         return g_oendscene(device);
 
-    if (!g_show_ui.load())
+    if (!app_states::g_show_ui.load())
         return g_oendscene(device);
 
     render_imgui_ui();
@@ -132,7 +127,7 @@ LRESULT __stdcall hk_wndproc(HWND hwnd, UINT msg, WPARAM w_param, LPARAM l_param
         switch (w_param)
         {
         case VK_F12:
-            g_show_ui.store(!g_show_ui.load());
+            app_states::g_show_ui.store(!app_states::g_show_ui.load());
             break;
         case VK_END:
             on_dll_detach();
@@ -140,7 +135,7 @@ LRESULT __stdcall hk_wndproc(HWND hwnd, UINT msg, WPARAM w_param, LPARAM l_param
         }
     }
 
-    if (g_show_ui.load())
+    if (app_states::g_show_ui.load())
     {
         if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, w_param, l_param))
             return 0;
@@ -233,7 +228,7 @@ bool __stdcall hook_functions()
     if (initialize_result != MH_OK)
         return false;
 
-    g_minhook_initialized.store(true);
+    app_states::g_minhook_initialized.store(true);
 
     bool enscene_hook_result = hook_function_endscene();
     bool reset_hook_result = hook_function_reset();
@@ -264,14 +259,14 @@ void __stdcall on_dll_attach()
 
 void __stdcall on_dll_detach()
 {
-    if (g_imgui_initialized.load())
+    if (app_states::g_imgui_initialized.load())
     {
         ImGui_ImplDX9_Shutdown();
         ImGui_ImplWin32_Shutdown();
         ImGui::DestroyContext();
     }
 
-    if (g_minhook_initialized.load())
+    if (app_states::g_minhook_initialized.load())
     {
         MH_DisableHook(MH_ALL_HOOKS);
         MH_Uninitialize();

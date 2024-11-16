@@ -29,6 +29,7 @@ set(SOURCES
     src/helpers/hooking.cpp
     src/helpers/windows.cpp
     src/helpers/bf2_classes.cpp
+    src/app_states.cpp
 )
 
 set(IMGUI_DIR ${CMAKE_SOURCE_DIR}/external/imgui)
