@@ -12,7 +12,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Add the source files for the library
 set(SOURCES
-    src/main.cpp
+    src/dllmain.cpp
     src/helpers/module_addresses.cpp
     src/features/feature_common.cpp
     src/features/nametags/nametags.cpp

@@ -1,4 +1,3 @@
-#include <MinHook.h>
 #include <atomic>
 #include <cstdint>
 #include <minwindef.h>
@@ -6,6 +5,8 @@
 #include <d3d9.h>
 #include <d3d9types.h>
 #include <d3dx9.h>
+
+#include <MinHook.h>
 
 #include <imgui/imgui.h>
 #include <imgui/backends/imgui_impl_win32.h>
@@ -17,8 +18,6 @@
 #include <features/minimap/minimap_manager.hpp>
 #include <helpers/hooking.hpp>
 #include <helpers/windows.hpp>
-
-#include <fstream>
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 void __stdcall on_dll_detach();
@@ -34,6 +33,8 @@ ResetFn g_oreset{};
 std::atomic<bool> g_show_ui{false};
 std::atomic<bool> g_enable_nametags{false};
 std::atomic<bool> g_enable_maphack{false};
+std::atomic<bool> g_imgui_initialized{false};
+std::atomic<bool> g_minhook_initialized{false};
 
 auto g_nametag_manager = managers::NametagsManager{};
 auto g_minimap_manager = managers::MinimapManager{};
@@ -101,16 +102,14 @@ void __stdcall render_imgui_ui()
 
 HRESULT __stdcall hk_endscene(IDirect3DDevice9* device)
 {
-    static bool is_ui_initialized{false};
-
-    if (!is_ui_initialized)
+    if (!g_imgui_initialized.load())
     {
         bool initialization_result = initialize_imgui(device);
 
         if (!initialization_result)
             return g_oendscene(device);
 
-        is_ui_initialized = true;
+        g_imgui_initialized.store(true);
     }
 
     HRESULT result = device->TestCooperativeLevel();
@@ -128,18 +127,18 @@ HRESULT __stdcall hk_endscene(IDirect3DDevice9* device)
 
 LRESULT __stdcall hk_wndproc(HWND hwnd, UINT msg, WPARAM w_param, LPARAM l_param)
 {
-    // if (msg == WM_KEYDOWN)
-    // {
-    //     switch (w_param)
-    //     {
-    //     case VK_F12:
-    //         g_show_ui.store(!g_show_ui.load());
-    //         break;
-    //     case VK_END:
-    //         on_dll_detach();
-    //         break;
-    //     }
-    // }
+    if (msg == WM_KEYDOWN)
+    {
+        switch (w_param)
+        {
+        case VK_F12:
+            g_show_ui.store(!g_show_ui.load());
+            break;
+        case VK_END:
+            on_dll_detach();
+            break;
+        }
+    }
 
     if (g_show_ui.load())
     {
@@ -154,6 +153,20 @@ HRESULT __stdcall hk_reset(IDirect3DDevice9* p_device, D3DPRESENT_PARAMETERS* p_
 {
     ImGui_ImplDX9_InvalidateDeviceObjects();
 
+    ImGui_ImplWin32_Shutdown();
+
+    auto main_window_handle = helpers::windows::get_main_window_handle();
+    ImGui_ImplWin32_Init(main_window_handle);
+
+    LONG_PTR original_wndproc_address = SetWindowLongPtr(main_window_handle, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(hk_wndproc));
+
+    g_owndproc = reinterpret_cast<WndProcFn>(original_wndproc_address);
+
+    LPVOID reset_address = helpers::hooking::get_reset_address();
+    LPVOID hk_reset_address = reinterpret_cast<LPVOID>(&hk_reset);
+
+    MH_STATUS reset_hook_result = MH_CreateHook(reset_address, hk_reset_address, reinterpret_cast<LPVOID*>(&g_oreset));
+
     HRESULT hr = g_oreset(p_device, p_d3dpp);
 
     if (SUCCEEDED(hr))
@@ -164,84 +177,105 @@ HRESULT __stdcall hk_reset(IDirect3DDevice9* p_device, D3DPRESENT_PARAMETERS* p_
     return hr;
 }
 
-void __stdcall hook_functions()
+bool __stdcall hook_function_endscene()
 {
-    HWND main_window_handle = helpers::windows::get_main_window_handle();
     LPVOID endscene_address = helpers::hooking::get_endscene_address();
     LPVOID hk_endscene_address = reinterpret_cast<LPVOID>(&hk_endscene);
-    LPVOID reset_address = helpers::hooking::get_reset_address();
-    LPVOID hk_reset_address = reinterpret_cast<LPVOID>(&hk_reset);
-
-    MH_STATUS initialize_result = MH_Initialize();
-
-    if (initialize_result != MH_OK)
-        return;
 
     MH_STATUS endscene_hook_result = MH_CreateHook(endscene_address, hk_endscene_address, reinterpret_cast<LPVOID*>(&g_oendscene));
 
     if ((endscene_hook_result != MH_OK))
-        return;
+        return false;
 
     MH_STATUS enable_endscene_result = MH_EnableHook(endscene_address);
 
-    LONG_PTR original_wndproc_address = SetWindowLongPtr(main_window_handle, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(hk_wndproc));
+    if ((enable_endscene_result != MH_OK))
+        return false;
 
-    if (!original_wndproc_address)
-        return;
+    return true;
+}
 
-    g_owndproc = reinterpret_cast<WndProcFn>(original_wndproc_address);
+bool __stdcall hook_function_reset()
+{
+    LPVOID reset_address = helpers::hooking::get_reset_address();
+    LPVOID hk_reset_address = reinterpret_cast<LPVOID>(&hk_reset);
 
     MH_STATUS reset_hook_result = MH_CreateHook(reset_address, hk_reset_address, reinterpret_cast<LPVOID*>(&g_oreset));
 
     if ((reset_hook_result != MH_OK))
-        return;
+        return false;
 
     MH_STATUS reset_endscene_result = MH_EnableHook(reset_address);
 
     if (reset_endscene_result != MH_OK)
-        return;
+        return false;
+
+    return true;
 }
 
-DWORD __stdcall cheatloop(LPVOID)
+bool __stdcall hook_function_wndproc()
 {
-    hook_functions();
+    HWND main_window_handle = helpers::windows::get_main_window_handle();
+    LONG_PTR original_wndproc_address = SetWindowLongPtr(main_window_handle, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(hk_wndproc));
 
-    SHORT previous_state_f12{0};
+    if (!original_wndproc_address)
+        return false;
 
-    while (true)
-    {
-        SHORT current_state_f12 = GetAsyncKeyState(VK_F12);
+    g_owndproc = reinterpret_cast<WndProcFn>(original_wndproc_address);
 
-        if ((current_state_f12 & 0x8000) && !(previous_state_f12 & 0x8000))
-        {
-            g_show_ui.store(!g_show_ui.load());
-        }
+    return true;
+}
 
-        previous_state_f12 = current_state_f12;
+bool __stdcall hook_functions()
+{
+    MH_STATUS initialize_result = MH_Initialize();
 
-        Sleep(constants::KEY_POLL_VAL_MS);
-    }
+    if (initialize_result != MH_OK)
+        return false;
+
+    g_minhook_initialized.store(true);
+
+    bool enscene_hook_result = hook_function_endscene();
+    bool reset_hook_result = hook_function_reset();
+    bool wndproc_hook_result = hook_function_wndproc();
+
+    return enscene_hook_result || reset_hook_result || wndproc_hook_result;
+}
+
+DWORD __stdcall bf2_memhack_init(LPVOID)
+{
+    const char* message_box_text{"dll successfully injected"};
+    const char* message_box_caption{"BF2_MEMHACK"};
+
+    MessageBox(NULL, message_box_text, message_box_caption, MB_OK | MB_ICONINFORMATION);
+
+    bool result = hook_functions();
+
+    if (!result)
+        on_dll_detach();
 
     return 0;
 }
 
 void __stdcall on_dll_attach()
 {
-    const char* message_box_text{"dll successfully injected"};
-    const char* message_box_caption{"BF2_MEMHACK"};
-
-    MessageBox(NULL, message_box_text, message_box_caption, MB_OK | MB_ICONINFORMATION);
-    CreateThread(NULL, 0, reinterpret_cast<LPTHREAD_START_ROUTINE>(cheatloop), NULL, 0, NULL);
+    CreateThread(NULL, 0, reinterpret_cast<LPTHREAD_START_ROUTINE>(bf2_memhack_init), NULL, 0, NULL);
 }
 
 void __stdcall on_dll_detach()
 {
-    ImGui_ImplDX9_Shutdown();
-    ImGui_ImplWin32_Shutdown();
-    ImGui::DestroyContext();
+    if (g_imgui_initialized.load())
+    {
+        ImGui_ImplDX9_Shutdown();
+        ImGui_ImplWin32_Shutdown();
+        ImGui::DestroyContext();
+    }
 
-    MH_DisableHook(MH_ALL_HOOKS);
-    MH_Uninitialize();
+    if (g_minhook_initialized.load())
+    {
+        MH_DisableHook(MH_ALL_HOOKS);
+        MH_Uninitialize();
+    }
 }
 
 BOOL WINAPI DllMain(HINSTANCE hinst_dll, DWORD fdw_reason, LPVOID lpv_reserved)
