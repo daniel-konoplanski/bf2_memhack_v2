@@ -11,12 +11,19 @@ namespace managers
 class MinimapManager
 {
 public:
-    MinimapManager();
+    static MinimapManager& instance();
+    bool is_enabled();
     void enable();
     void disable();
 
 private:
-    std::list<std::unique_ptr<features::IFeature>> m_features{};
+    MinimapManager();
+    MinimapManager(const MinimapManager&) = delete;
+    MinimapManager& operator=(const MinimapManager&) = delete;
+
+private:
+    bool m_enabled{false};
+    std::list<features::IFeaturePtr> m_features{};
 };
 
 using MinimapManagerPtr = std::unique_ptr<MinimapManager>;

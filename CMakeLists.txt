@@ -30,6 +30,11 @@ set(SOURCES
     src/helpers/windows.cpp
     src/helpers/bf2_classes.cpp
     src/app_states.cpp
+    src/hooks/original_functions.cpp
+    src/hooks/functions/dx9.cpp
+    src/hooks/functions/windows.cpp
+    src/gui/imgui_manager.cpp
+    src/hooks/hook_manager.cpp
 )
 
 set(IMGUI_DIR ${CMAKE_SOURCE_DIR}/external/imgui)

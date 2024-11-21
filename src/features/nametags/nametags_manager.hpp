@@ -11,12 +11,19 @@ namespace managers
 class NametagsManager
 {
 public:
-    NametagsManager();
+    static NametagsManager& instance();
+    bool is_enabled();
     void enable();
     void disable();
 
 private:
-    std::list<std::unique_ptr<features::IFeature>> m_features{};
+    NametagsManager();
+    NametagsManager(const NametagsManager&) = delete;
+    NametagsManager& operator=(const NametagsManager&) = delete;
+
+private:
+    bool m_enabled{false};
+    std::list<features::IFeaturePtr> m_features{};
 };
 
 using NametagsManagerPtr = std::unique_ptr<NametagsManager>;

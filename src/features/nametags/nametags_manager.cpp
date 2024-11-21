@@ -8,6 +8,12 @@
 namespace managers
 {
 
+NametagsManager& NametagsManager::instance()
+{
+    static NametagsManager instance{};
+    return instance;
+}
+
 NametagsManager::NametagsManager()
 {
     using namespace features::nametags;
@@ -17,13 +23,20 @@ NametagsManager::NametagsManager()
     m_features.push_back(std::make_unique<NametagsDisplayDistance>());
     m_features.push_back(std::make_unique<NametagsDistanceRange>());
 }
-    
+
+bool NametagsManager::is_enabled()
+{
+    return m_enabled;
+}
+
 void NametagsManager::enable()
 {
     for (const auto& feature : m_features)
     {
         feature->enable();
     }
+
+    m_enabled = true;
 }
 
 void NametagsManager::disable()
@@ -32,6 +45,8 @@ void NametagsManager::disable()
     {
         feature->disable();
     }
+
+    m_enabled = false;
 }
 
 }  // namespace managers

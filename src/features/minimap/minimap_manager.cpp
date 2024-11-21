@@ -8,6 +8,12 @@
 namespace managers
 {
 
+MinimapManager& MinimapManager::instance()
+{
+    static MinimapManager instance{};
+    return instance;
+}
+
 MinimapManager::MinimapManager()
 {
     using namespace features::minimap;
@@ -18,12 +24,19 @@ MinimapManager::MinimapManager()
     m_features.push_back(std::make_unique<KitIcons>());
 }
 
+bool MinimapManager::is_enabled()
+{
+    return m_enabled;
+}
+
 void MinimapManager::enable()
 {
     for (const auto& feature : m_features)
     {
         feature->enable();
     }
+
+    m_enabled = true;
 }
 
 void MinimapManager::disable()
@@ -32,6 +45,8 @@ void MinimapManager::disable()
     {
         feature->disable();
     }
+
+    m_enabled = false;
 }
 
 }  // namespace managers

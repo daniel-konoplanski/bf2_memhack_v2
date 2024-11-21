@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 namespace features
 {
 
@@ -10,5 +12,7 @@ public:
     virtual void enable() = 0;
     virtual void disable() = 0;
 };
+
+using IFeaturePtr = std::unique_ptr<features::IFeature>;
 
 }  // features
