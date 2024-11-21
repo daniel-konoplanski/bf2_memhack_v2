@@ -48,6 +48,11 @@ void HookManager::disable_hooks()
     }
 }
 
+bool HookManager::is_initialized()
+{
+    return m_initialized;
+}
+
 bool HookManager::hook_function_endscene()
 {
     LPVOID endscene_address = helpers::hooking::get_endscene_address();

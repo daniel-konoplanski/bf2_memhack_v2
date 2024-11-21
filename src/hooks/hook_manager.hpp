@@ -13,6 +13,7 @@ public:
     static HookManager& instance();
     bool enable_hooks();
     void disable_hooks();
+    bool is_initialized();
 
 private:
     HookManager();

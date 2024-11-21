@@ -24,8 +24,8 @@
 #include <helpers/windows.hpp>
 #include <hooks/functions/dx9.hpp>
 #include <hooks/functions/windows.hpp>
-#include <hooks/original_functions.hpp>
 #include <hooks/hook_manager.hpp>
+#include <hooks/original_functions.hpp>
 
 void __stdcall on_dll_detach();
 
@@ -77,10 +77,9 @@ void __stdcall on_dll_detach()
         ImGui::DestroyContext();
     }
 
-    if (app_states::g_minhook_initialized.load())
+    if (managers::HookManager::instance().is_initialized())
     {
-        MH_DisableHook(MH_ALL_HOOKS);
-        MH_Uninitialize();
+        managers::HookManager::instance().disable_hooks();
     }
 }
 
