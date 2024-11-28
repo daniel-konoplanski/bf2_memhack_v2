@@ -23,6 +23,8 @@ HookManager::HookManager()
 
 bool HookManager::enable_hooks()
 {
+    std::lock_guard<std::mutex> lock{m_mutex};
+
     MH_STATUS initialize_result = MH_Initialize();
 
     if (initialize_result != MH_OK)
@@ -39,6 +41,8 @@ bool HookManager::enable_hooks()
 
 void HookManager::disable_hooks()
 {
+    std::lock_guard<std::mutex> lock{m_mutex};
+
     if (m_initialized)
     {
         MH_DisableHook(MH_ALL_HOOKS);
@@ -50,6 +54,8 @@ void HookManager::disable_hooks()
 
 bool HookManager::is_initialized()
 {
+    std::lock_guard<std::mutex> lock{m_mutex};
+
     return m_initialized;
 }
 

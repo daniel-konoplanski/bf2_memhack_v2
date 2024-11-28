@@ -29,7 +29,6 @@ set(SOURCES
     src/helpers/hooking.cpp
     src/helpers/windows.cpp
     src/helpers/bf2_classes.cpp
-    src/app_states.cpp
     src/hooks/original_functions.cpp
     src/hooks/functions/dx9.cpp
     src/hooks/functions/windows.cpp
@@ -66,7 +65,7 @@ include_directories(
 
 target_include_directories(bf2memhack PRIVATE ${IMGUI_DIR} ${IMGUI_DIR}/backends)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libgcc -static-libstdc++")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libgcc -static-libstdc++ -static -lwinpthread")
 
 add_library(MinHook STATIC IMPORTED)
 

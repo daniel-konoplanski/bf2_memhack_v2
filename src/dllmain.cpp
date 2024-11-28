@@ -14,7 +14,6 @@
 #include <imgui/backends/imgui_impl_win32.h>
 #include <imgui/imgui.h>
 
-#include <app_states.hpp>
 #include <constants/constants.hpp>
 #include <features/minimap/minimap_manager.hpp>
 #include <features/nametags/nametags_manager.hpp>
@@ -33,17 +32,17 @@ bool __stdcall initialize_imgui(IDirect3DDevice9* device)
 {
     ImGui::CreateContext();
 
-    ImGuiIO &io = ImGui::GetIO();
+    ImGuiIO& io = ImGui::GetIO();
     io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 
     HWND main_window_handle = helpers::windows::get_main_window_handle();
 
     if (!ImGui_ImplWin32_Init(main_window_handle))
-      return false;
+        return false;
 
     if (!ImGui_ImplDX9_Init(device))
-      return false;
+        return false;
 
     return true;
 }

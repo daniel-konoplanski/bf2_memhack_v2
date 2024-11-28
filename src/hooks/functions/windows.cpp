@@ -4,7 +4,6 @@
 #include <imgui/backends/imgui_impl_win32.h>
 #include <imgui/backends/imgui_impl_dx9.h>
 
-#include <app_states.hpp>
 #include <gui/imgui_manager.hpp>
 #include <hooks/original_functions.hpp>
 

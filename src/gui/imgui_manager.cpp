@@ -6,7 +6,6 @@
 #include <imgui/backends/imgui_impl_win32.h>
 #include <imgui/backends/imgui_impl_dx9.h>
 
-#include <app_states.hpp>
 #include <helpers/windows.hpp>
 
 namespace managers
@@ -103,11 +102,15 @@ void GuiManager::render_content()
 
 void GuiManager::set_rendering(bool state)
 {
+    std::lock_guard<std::mutex> lock{m_mutex};
+
     m_render_state = state;
 }
 
 bool GuiManager::is_rendering()
 {
+    std::lock_guard<std::mutex> lock{m_mutex};
+
     return m_render_state;
 }
 

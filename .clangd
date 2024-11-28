@@ -1,2 +1,2 @@
 Diagnostics:
-  Suppress: ['builtin_definitions']
+    Suppress: ['builtin_definitions']

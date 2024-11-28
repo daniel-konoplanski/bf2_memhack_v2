@@ -20,5 +20,5 @@ PenaltyReturnTypeOnItsOwnLine: 1000
 ExperimentalAutoDetectBinPacking: false
 PointerAlignment: Left
 AlwaysBreakTemplateDeclarations: Yes
-AllowShortCaseLabelsOnASingleLine: true
+AllowShortCaseLabelsOnASingleLine: false
 IndentExternBlock: NoIndent

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <mutex>
+
 #include <d3d9.h>
 #include <d3d9types.h>
 #include <d3dx9.h>
@@ -27,6 +29,7 @@ private:
     bool hook_function_wndproc();
 
 private:
+    mutable std::mutex m_mutex{};
     bool m_initialized{false};
 };
 

@@ -2,6 +2,7 @@
 
 #include <list>
 #include <memory>
+#include <mutex>
 
 #include <features/i_feature.hpp>
 
@@ -22,6 +23,7 @@ private:
     NametagsManager& operator=(const NametagsManager&) = delete;
 
 private:
+    mutable std::mutex m_mutex{};
     bool m_enabled{false};
     std::list<features::IFeaturePtr> m_features{};
 };

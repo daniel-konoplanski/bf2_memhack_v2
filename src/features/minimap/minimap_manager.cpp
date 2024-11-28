@@ -26,11 +26,15 @@ MinimapManager::MinimapManager()
 
 bool MinimapManager::is_enabled()
 {
+    std::lock_guard<std::mutex> lock{m_mutex};
+
     return m_enabled;
 }
 
 void MinimapManager::enable()
 {
+    std::lock_guard<std::mutex> lock{m_mutex};
+
     for (const auto& feature : m_features)
     {
         feature->enable();
@@ -41,6 +45,8 @@ void MinimapManager::enable()
 
 void MinimapManager::disable()
 {
+    std::lock_guard<std::mutex> lock{m_mutex};
+
     for (const auto& feature : m_features)
     {
         feature->disable();

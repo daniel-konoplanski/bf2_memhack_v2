@@ -1,5 +1,7 @@
 #pragma once
 
+#include <mutex>
+
 #include <d3d9.h>
 #include <d3d9types.h>
 #include <d3dx9.h>
@@ -26,6 +28,7 @@ private:
     void render_content();
 
 private:
+    mutable std::mutex m_mutex{};
     bool m_initialized{false};
     bool m_render_state{false};
 };
