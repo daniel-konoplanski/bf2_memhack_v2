@@ -91,29 +91,17 @@ void GuiManager::render_content()
         threads::TaskFunc task{};
 
         if (enable_nametags)
-        {
-            threads::worker.add_task([]() {
-                helpers::windows::mutually_exclusive([]() { managers::NametagsManager::instance().enable(); }); });
-        }
+            threads::worker.add_task([]() { managers::NametagsManager::instance().enable(); });
         else
-        {
-            threads::worker.add_task([]() {
-                helpers::windows::mutually_exclusive([]() { managers::NametagsManager::instance().disable(); }); });
-        }
+            threads::worker.add_task([]() { managers::NametagsManager::instance().disable(); });
     }
 
     if (ImGui::Checkbox("Enable Maphack", &enable_maphack))
     {
         if (enable_maphack)
-        {
-            threads::worker.add_task([]() {
-                helpers::windows::mutually_exclusive([]() { managers::MinimapManager::instance().enable(); }); });
-        }
+            threads::worker.add_task([]() { managers::MinimapManager::instance().enable(); });
         else
-        {
-            threads::worker.add_task([]() {
-                helpers::windows::mutually_exclusive([]() { managers::MinimapManager::instance().disable(); }); });
-        }
+            threads::worker.add_task([]() { managers::MinimapManager::instance().disable(); });
     }
 }
 
