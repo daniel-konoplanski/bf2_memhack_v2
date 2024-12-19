@@ -1,5 +1,9 @@
 #include "windows.hpp"
+
 #include <cstddef>
+#include <functional>
+#include <tlhelp32.h>
+#include <vector>
 
 namespace helpers::windows
 {
@@ -60,4 +64,79 @@ HWND __stdcall get_main_window_handle()
     return hwnd;
 }
 
-}  // namespace helpers::windows
+std::vector<HANDLE> threads_for_current_process()
+{
+    std::vector<HANDLE> threadHandles;
+    DWORD currentProcessId = GetCurrentProcessId();
+
+    HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0);
+    if (hSnapshot != INVALID_HANDLE_VALUE)
+    {
+        THREADENTRY32 te;
+        te.dwSize = sizeof(THREADENTRY32);
+
+        if (Thread32First(hSnapshot, &te))
+        {
+            do
+            {
+                if (te.th32OwnerProcessID == currentProcessId)
+                {
+                    HANDLE hThread = OpenThread(THREAD_SUSPEND_RESUME | THREAD_QUERY_INFORMATION, FALSE, te.th32ThreadID);
+
+                    if (hThread != NULL)
+                    {
+                        threadHandles.push_back(hThread);
+                    }
+                    else
+                    {
+                        DWORD error = GetLastError();
+                    }
+                }
+            } while (Thread32Next(hSnapshot, &te));
+        }
+
+        CloseHandle(hSnapshot);
+    }
+    else
+    {
+        DWORD error = GetLastError();
+    }
+
+    return threadHandles;
+}
+
+void mutually_exclusive(const std::function<void()>& action)
+{
+    const auto current_threads = threads_for_current_process();
+
+    std::vector<HANDLE> handles;
+
+    DWORD currentThreadId = GetCurrentThreadId();
+
+    for (const auto& h : current_threads)
+    {
+        if (GetThreadId(h) != currentThreadId)
+        {
+            handles.push_back(h);
+        }
+        else
+        {
+            CloseHandle(h);
+        }
+    }
+
+    for (const auto& handle : handles)
+    {
+        SuspendThread(handle);
+    }
+
+    action();
+
+    for (const auto& handle : handles)
+    {
+        ResumeThread(handle);
+        CloseHandle(handle);
+    }
+}
+
+} // namespace helpers::windows

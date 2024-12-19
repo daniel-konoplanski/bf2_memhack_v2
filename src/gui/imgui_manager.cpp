@@ -1,12 +1,15 @@
 #include "imgui_manager.hpp"
-#include "features/minimap/minimap_manager.hpp"
-#include "features/nametags/nametags_manager.hpp"
 
+#include <functional>
 #include <imgui/imgui.h>
 #include <imgui/backends/imgui_impl_win32.h>
 #include <imgui/backends/imgui_impl_dx9.h>
 
+#include <features/minimap/minimap_manager.hpp>
+#include <features/nametags/nametags_manager.hpp>
+
 #include <helpers/windows.hpp>
+#include <worker.hpp>
 
 namespace managers
 {
@@ -85,18 +88,32 @@ void GuiManager::render_content()
 
     if (ImGui::Checkbox("Enable Nametags", &enable_nametags))
     {
+        threads::TaskFunc task{};
+
         if (enable_nametags)
-            managers::NametagsManager::instance().enable();
+        {
+            threads::worker.add_task([]() {
+                helpers::windows::mutually_exclusive([]() { managers::NametagsManager::instance().enable(); }); });
+        }
         else
-            managers::NametagsManager::instance().disable();
+        {
+            threads::worker.add_task([]() {
+                helpers::windows::mutually_exclusive([]() { managers::NametagsManager::instance().disable(); }); });
+        }
     }
 
     if (ImGui::Checkbox("Enable Maphack", &enable_maphack))
     {
         if (enable_maphack)
-            managers::MinimapManager::instance().enable();
+        {
+            threads::worker.add_task([]() {
+                helpers::windows::mutually_exclusive([]() { managers::MinimapManager::instance().enable(); }); });
+        }
         else
-            managers::MinimapManager::instance().disable();
+        {
+            threads::worker.add_task([]() {
+                helpers::windows::mutually_exclusive([]() { managers::MinimapManager::instance().disable(); }); });
+        }
     }
 }
 

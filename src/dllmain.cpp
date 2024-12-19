@@ -6,6 +6,8 @@
 #include <d3d9types.h>
 #include <d3dx9.h>
 #include <minwindef.h>
+#include <synchapi.h>
+#include <thread>
 #include <windows.h>
 
 #include <MinHook.h>
@@ -25,6 +27,7 @@
 #include <hooks/functions/windows.hpp>
 #include <hooks/hook_manager.hpp>
 #include <hooks/original_functions.hpp>
+#include <worker.hpp>
 
 void __stdcall on_dll_detach();
 
@@ -54,6 +57,8 @@ DWORD __stdcall bf2_memhack_init(LPVOID)
 
     MessageBox(NULL, message_box_text, message_box_caption, MB_OK | MB_ICONINFORMATION);
 
+    threads::worker.start();
+
     bool result = managers::HookManager::instance().enable_hooks();
 
     if (!result)
@@ -69,6 +74,8 @@ void __stdcall on_dll_attach()
 
 void __stdcall on_dll_detach()
 {
+    threads::worker.stop();
+
     if (managers::GuiManager::instance().is_initialized())
     {
         ImGui_ImplDX9_Shutdown();

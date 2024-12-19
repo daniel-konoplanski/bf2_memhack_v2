@@ -34,6 +34,7 @@ set(SOURCES
     src/hooks/functions/windows.cpp
     src/gui/imgui_manager.cpp
     src/hooks/hook_manager.cpp
+    src/worker.cpp
 )
 
 set(IMGUI_DIR ${CMAKE_SOURCE_DIR}/external/imgui)
