@@ -1,16 +1,16 @@
 #include "dx9.hpp"
-#include "hooks/functions/windows.hpp"
 #include "gui/imgui_manager.hpp"
+#include "hooks/functions/windows.hpp"
 
-#include <imgui/imgui.h>
-#include <imgui/backends/imgui_impl_win32.h>
-#include <imgui/backends/imgui_impl_dx9.h>
+#include <imgui_impl_dx9.h>
+#include <imgui_impl_win32.h>
+#include <imgui.h>
 
-#include <hooks/functions/windows.hpp>
+#include <gui/imgui_manager.hpp>
 #include <helpers/hooking.hpp>
 #include <helpers/windows.hpp>
+#include <hooks/functions/windows.hpp>
 #include <hooks/original_functions.hpp>
-#include <gui/imgui_manager.hpp>
 
 namespace hooks::dx9
 {

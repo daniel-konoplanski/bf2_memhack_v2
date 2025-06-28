@@ -1,8 +1,8 @@
 #include "windows.hpp"
 
-#include <imgui/imgui.h>
-#include <imgui/backends/imgui_impl_win32.h>
-#include <imgui/backends/imgui_impl_dx9.h>
+#include <imgui.h>
+#include <imgui_impl_win32.h>
+#include <imgui_impl_dx9.h>
 
 #include <gui/imgui_manager.hpp>
 #include <hooks/original_functions.hpp>

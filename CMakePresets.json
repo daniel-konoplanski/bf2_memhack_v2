@@ -1,0 +1,15 @@
+{
+    "version": 2,
+    "configurePresets": [
+        {
+            "name": "mingw-32",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build",
+            "cacheVariables": {
+                "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+                "VCPKG_CHAINLOAD_TOOLCHAIN_FILE": "${sourceDir}/toolchains/i686-w64-windows.cmake",
+                "VCPKG_TARGET_TRIPLET": "x86-mingw-static"
+            }
+        }
+    ]
+}

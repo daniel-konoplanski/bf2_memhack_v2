@@ -4,7 +4,7 @@
 #include <memory>
 #include <mutex>
 
-#include <features/i_feature.hpp>
+#include "features/i_feature.hpp"
 
 namespace managers
 {
@@ -24,7 +24,7 @@ private:
 
 private:
     mutable std::mutex m_mutex{};
-    bool m_enabled{false};
+    bool m_enabled{};
     std::list<features::IFeaturePtr> m_features{};
 };
 

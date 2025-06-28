@@ -1,0 +1,14 @@
+{
+    "dependencies": [
+        {
+            "name": "imgui",
+            "features": [
+                "dx9-binding",
+                "win32-binding"
+            ]
+        },
+        {
+            "name": "minhook"
+        }
+    ]
+}

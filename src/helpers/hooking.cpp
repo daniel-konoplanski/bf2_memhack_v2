@@ -1,9 +1,9 @@
 #include "hooking.hpp"
 
 #include <algorithm>
-#include <memory>
+#include <array>
 
-#include <helpers/bf2_classes.hpp>
+#include "helpers/bf2_classes.hpp"
 
 namespace helpers::hooking
 {

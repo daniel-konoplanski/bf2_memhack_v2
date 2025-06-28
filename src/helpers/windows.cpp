@@ -1,9 +1,6 @@
 #include "windows.hpp"
 
-#include <cstddef>
-#include <functional>
 #include <tlhelp32.h>
-#include <vector>
 
 namespace helpers::windows
 {

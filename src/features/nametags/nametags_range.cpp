@@ -1,8 +1,7 @@
 #include "nametags_range.hpp"
 
-#include <helpers/module_addresses.hpp>
-#include <constants/constants.hpp>
-#include <helpers/memory_operations.hpp>
+#include "helpers/module_addresses.hpp"
+#include "constants/constants.hpp"
 
 namespace features::nametags
 {

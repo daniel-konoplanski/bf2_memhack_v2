@@ -1,10 +1,8 @@
 #pragma once
 
 #include <d3d9.h>
-#include <d3d9types.h>
-#include <d3dx9.h>
-#include <minwindef.h>
-#include <minhook/include/MinHook.h>
+
+#include <MinHook.h>
 
 namespace helpers::hooking
 {

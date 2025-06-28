@@ -1,7 +1,6 @@
-#include <helpers/module_addresses.hpp>
-#include <helpers/memory_operations.hpp>
-
 #include "nametags_display_distance.hpp"
+
+#include "helpers/module_addresses.hpp"
 
 namespace features::nametags
 {

@@ -1,5 +1,6 @@
-#include "constants/assembly_instructions.hpp"
 #include "memory_operations.hpp"
+
+#include "constants/assembly_instructions.hpp"
 
 namespace helpers::memory_operarions
 {

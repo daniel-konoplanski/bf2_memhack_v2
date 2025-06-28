@@ -1,9 +1,9 @@
 #include "nametags_manager.hpp"
 
-#include <features/nametags/nametags.hpp>
-#include <features/nametags/nametags_range.hpp>
-#include <features/nametags/nametags_display_distance.hpp>
-#include <features/nametags/nametags_distance_range.hpp>
+#include "features/nametags/nametags.hpp"
+#include "features/nametags/nametags_range.hpp"
+#include "features/nametags/nametags_display_distance.hpp"
+#include "features/nametags/nametags_distance_range.hpp"
 
 namespace managers
 {

@@ -1,12 +1,8 @@
 #include "bf2_classes.hpp"
 
-#include <span>
-#include <corecrt.h>
-#include <minwindef.h>
 #include <windows.h>
 
-#include <helpers/module_addresses.hpp>
-#include <helpers/memory_operations.hpp>
+#include "helpers/module_addresses.hpp"
 
 namespace helpers::bf2_classes
 {

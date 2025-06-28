@@ -1,15 +1,13 @@
 #include "imgui_manager.hpp"
 
-#include <functional>
-#include <imgui/imgui.h>
-#include <imgui/backends/imgui_impl_win32.h>
-#include <imgui/backends/imgui_impl_dx9.h>
+#include <imgui.h>
+#include <imgui_impl_dx9.h>
+#include <imgui_impl_win32.h>
 
-#include <features/minimap/minimap_manager.hpp>
-#include <features/nametags/nametags_manager.hpp>
-
-#include <helpers/windows.hpp>
-#include <worker.hpp>
+#include "features/minimap/minimap_manager.hpp"
+#include "features/nametags/nametags_manager.hpp"
+#include "helpers/windows.hpp"
+#include "worker.hpp"
 
 namespace managers
 {

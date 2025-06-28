@@ -37,3 +37,6 @@ yarn-error.log*
 # Optional: Ignore env files
 .env
 .env.*
+
+# clangd
+.cache

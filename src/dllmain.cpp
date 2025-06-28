@@ -1,20 +1,17 @@
 #include "gui/imgui_manager.hpp"
 
-#include <atomic>
-#include <cstdint>
 #include <d3d9.h>
 #include <d3d9types.h>
 #include <d3dx9.h>
 #include <minwindef.h>
 #include <synchapi.h>
-#include <thread>
 #include <windows.h>
 
 #include <MinHook.h>
 
-#include <imgui/backends/imgui_impl_dx9.h>
-#include <imgui/backends/imgui_impl_win32.h>
-#include <imgui/imgui.h>
+#include <imgui_impl_dx9.h>
+#include <imgui_impl_win32.h>
+#include <imgui.h>
 
 #include <constants/constants.hpp>
 #include <features/minimap/minimap_manager.hpp>

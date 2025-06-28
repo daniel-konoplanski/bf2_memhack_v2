@@ -1,5 +1,7 @@
 #include "nametags.hpp"
 
+#include "helpers/module_addresses.hpp"
+
 namespace features::nametags
 {
 

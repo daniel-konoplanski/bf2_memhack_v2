@@ -1,8 +1,8 @@
 #pragma once
 
-#include <corecrt.h>
-#include <vector>
 #include <cstdint>
+#include <vector>
+
 #include <windows.h>
 
 namespace helpers::memory_operarions
