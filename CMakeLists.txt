@@ -8,8 +8,6 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-# Resolve required packages
-
 find_package(imgui CONFIG REQUIRED)
 find_package(minhook CONFIG REQUIRED)
 
