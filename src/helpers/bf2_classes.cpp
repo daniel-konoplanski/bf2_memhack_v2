@@ -9,8 +9,10 @@ namespace helpers::bf2_classes
 
 namespace
 {
-    // RendDX9.dll+23D098
-    constexpr uintptr_t renderer_offset = 0x23D098;
+
+// RendDX9.dll+23D098
+constexpr uintptr_t renderer_offset = 0x23D098;
+
 }
 
 ::bf2_classes::CRenderer* get_renderer_address()
