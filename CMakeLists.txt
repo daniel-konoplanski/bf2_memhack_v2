@@ -27,11 +27,12 @@ set_target_properties(bf2memhack PROPERTIES OUTPUT_NAME "bf2memhack" SUFFIX ".dl
 
 include_directories(${CMAKE_SOURCE_DIR}/src)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libgcc -static-libstdc++ -static -lwinpthread")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libgcc -static-libstdc++ -lwinpthread")
 
 target_link_libraries(bf2memhack PRIVATE
     imgui::imgui
     minhook::minhook
-    d3d9
     gdi32
-    dwmapi)
+    dwmapi
+    user32
+    shell32)
