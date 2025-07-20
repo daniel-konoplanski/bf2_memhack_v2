@@ -36,3 +36,5 @@ target_link_libraries(bf2memhack PRIVATE
     dwmapi
     user32
     shell32)
+
+message("VCPKG_BUILD_TYPE is ${VCPKG_BUILD_TYPE}")

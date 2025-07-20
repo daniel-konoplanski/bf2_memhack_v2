@@ -2,7 +2,5 @@ Diagnostics:
     Suppress: ['builtin_definitions']
 
 CompileFlags:
-  CompilationDatabase: "./build"
-
-QueryDriver:
-  - "/usr/bin/i686-w64-mingw32-g++
+    CompilationDatabase: "./build"
+    Compiler: i686-w64-mingw32-g++
