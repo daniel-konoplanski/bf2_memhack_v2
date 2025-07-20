@@ -5,11 +5,11 @@ A simple internal Battlefield 2 cheat that lets you toggle player nametags and 
 
 ## Features
 
-- **NameTags**
+- **NameTags** </br>
   Draws player names and distances above their heads.
-- **MapHack**
+- **MapHack** </br>
   Reveals the enemy positions on the minimap.
-- **In‑Game UI**
+- **In‑Game UI** </br>
   Minimal on‑screen menu for toggling features. Press **F12** to show/hide the menu
 
 
