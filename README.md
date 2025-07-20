@@ -41,10 +41,10 @@ Make sure all dependencies are installed and properly configured in your PATH.
 
 ## Screenshots
 
-![Menu](resources/images/menu.png)
-![Nametags](resources/images/nametags.png)
-![Maphack](resources/images/maphack.png)
-![Nametags and Maphack](resources/images/nametags_and_maphack.png)
+![Menu](resources/images/menu.jpg)
+![Nametags](resources/images/nametags.jpg)
+![Maphack](resources/images/maphack.jpg)
+![Nametags and Maphack](resources/images/nametags_and_maphack.jpg)
 
 
 ## ⚠️ Disclaimer
